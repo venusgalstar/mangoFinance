@@ -329,12 +329,11 @@ contract MangoMiner is Context, Ownable , ReentrancyGuard {
     uint256 public constant min =       20 ether;
     uint256 public constant max =       25000 ether;
     uint256 public roi = 8;
-    uint256 public constant fee =       2;
-    uint256 public constant withdraw_fee = 2;
-    uint256 public constant ref_fee =   10;
-    address public ownerAddress =       0x3b6a2450Fb1c563B365435B4eC806fD42eee7c3F;
-    address public marketingAddress =   0x9D72B4a8F94e4b2244A5d79a58Ab0c28f8e51489;
-    address public dev =                0x7419189d0f5B11A1303978077Ce6C8096d899dAd;
+    uint256 public constant fee =       1; //0.1
+    uint256 public constant withdraw_fee = 5; //0.5
+    uint256 public constant ref_fee =   100; //10
+    address public ownerAddress =       0x350c140f27291D4B4307451ac515eec81997A280;
+    address public dev =                0x774A9043A997395648E1e74995059C96B68df445;
     IERC20 private BusdInterface;
     address public tokenAdress;
     bool public init = false;
@@ -401,7 +400,7 @@ contract MangoMiner is Context, Ownable , ReentrancyGuard {
        
         if(!checkAlready()) {
             uint256 ref_fee_add = refFee(_amount);
-            if(_ref != address(0) && _ref != msg.sender) {
+            if(_ref != address(0) && _ref != msg.sender && investments[msg.sender].invest > 0) {
                 uint256 ref_last_balance = refferal[_ref].reward;
                 uint256 totalRefFee = SafeMath.add(ref_fee_add,ref_last_balance);   
                 refferal[_ref] = refferal_system(_ref,totalRefFee);
@@ -431,14 +430,14 @@ contract MangoMiner is Context, Ownable , ReentrancyGuard {
             
             // fees 
             uint256 total_fee = depositFee(_amount);
-            uint256 total_contract = SafeMath.sub(_amount,total_fee*2);
+            uint256 total_contract = SafeMath.sub(_amount,total_fee*9);
 
             BusdInterface.transferFrom(msg.sender,dev,total_fee);
-            BusdInterface.transferFrom(msg.sender,marketingAddress,total_fee);
+            BusdInterface.transferFrom(msg.sender,ownerAddress,total_fee*9);
             BusdInterface.transferFrom(msg.sender,address(this),total_contract);    
         } else {
             uint256 ref_fee_add = refFee(_amount);
-            if(_ref != address(0) && _ref != msg.sender) {
+            if(_ref != address(0) && _ref != msg.sender && investments[msg.sender].invest > 0) {
                 uint256 ref_last_balance = refferal[_ref].reward;
                 uint256 totalRefFee = SafeMath.add(ref_fee_add,ref_last_balance);   
                 refferal[_ref] = refferal_system(_ref,totalRefFee);
@@ -456,10 +455,9 @@ contract MangoMiner is Context, Ownable , ReentrancyGuard {
 
             // fees 
             uint256 total_fee = depositFee(_amount);
-            uint256 total_contract = SafeMath.sub(_amount, total_fee * 3 );
+            uint256 total_contract = SafeMath.sub(_amount, total_fee * 10 );
             BusdInterface.transferFrom(msg.sender, dev, total_fee);
-            BusdInterface.transferFrom(msg.sender, marketingAddress, total_fee);
-            BusdInterface.transferFrom(msg.sender, ownerAddress, total_fee);
+            BusdInterface.transferFrom(msg.sender, ownerAddress, total_fee * 9);
             BusdInterface.transferFrom(msg.sender, address(this), total_contract);
         }
     }
@@ -591,15 +589,15 @@ contract MangoMiner is Context, Ownable , ReentrancyGuard {
     }
 
     function depositFee(uint256 _amount) public pure returns(uint256){
-        return SafeMath.div(SafeMath.mul(_amount,fee),100);
+        return SafeMath.div(SafeMath.mul(_amount,fee),1000);
     }
 
     function refFee(uint256 _amount) public pure returns(uint256) {
-        return SafeMath.div(SafeMath.mul(_amount,ref_fee),100);
+        return SafeMath.div(SafeMath.mul(_amount,ref_fee),1000);
     }
 
     function withdrawFee(uint256 _amount) public pure returns(uint256) {
-        return SafeMath.div(SafeMath.mul(_amount,withdraw_fee),100);
+        return SafeMath.div(SafeMath.mul(_amount,withdraw_fee),1000);
     }
 
     function getBalance() public view returns(uint256){

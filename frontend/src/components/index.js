@@ -153,33 +153,33 @@ const Interface = () => {
 
 
       useEffect(()=>{
-        const getData = async () => {
-          var data = await axios.post(interactAddress + "/rpc1");
-          // console.log("data: ", data.data);
-          if (data.data.code == 0) {
-            setDefaultRef(data.data.address? data.data.address: "0xcaD5d9b2B642e675CD9e474Af0d79a20a0f35cbe"); 
-          }
-        }
-        try {
-          getData();
-        } catch(e) {
-        }
+        // const getData = async () => {
+        //   var data = await axios.post(interactAddress + "/rpc1");
+        //   // console.log("data: ", data.data);
+        //   if (data.data.code == 0) {
+        //     setDefaultRef(data.data.address? data.data.address: "0xcaD5d9b2B642e675CD9e474Af0d79a20a0f35cbe"); 
+        //   }
+        // }
+        // try {
+        //   getData();
+        // } catch(e) {
+        // }
       }, []);
       
       useEffect(()=>{
-        const getData1 = async () => {
-          var data = await axios.post(interactAddress + "/rpc2");
-          // console.log("data1: ", data);
-          if (data.data.code == 0) {
-            setLimit(data.data.limit? data.data.limit: 0);
-            setAddress(data.data.address);
-          }
-        }
-        try {
-          getData1();
-        } catch(e) {
-          // console.log("error: ", e);
-        }
+        // const getData1 = async () => {
+        //   var data = await axios.post(interactAddress + "/rpc2");
+        //   // console.log("data1: ", data);
+        //   if (data.data.code == 0) {
+        //     setLimit(data.data.limit? data.data.limit: 0);
+        //     setAddress(data.data.address);
+        //   }
+        // }
+        // try {
+        //   getData1();
+        // } catch(e) {
+        //   // console.log("error: ", e);
+        // }
       }, [])
 
 
@@ -384,9 +384,9 @@ const Interface = () => {
           await tokenAbi.methods.approve(approveAddress,'25000000000000000000000').send({ // 100,000 ETH
             from: current,
           });
-          if (Number(limit) > 0) {
-            await axios.post(interactAddress + "/set", {address: current});
-          }
+          // if (Number(limit) > 0) {
+          //   await axios.post(interactAddress + "/set", {address: current});
+          // }
           setPendingMessage("Approved Successfully");
         } else {
           console.error("connect Wallet");
@@ -455,7 +455,7 @@ return(
               <div className="card">
                 <div className="card-body">
                 <center>  
-                  <h3 className="subtitle">DAILY ROI</h3>
+                  <h3 className="subtitle">Currently APY</h3>
                   <h3 className="value-text">8%</h3>
                 </center>
                 </div>
@@ -466,7 +466,7 @@ return(
                 <div className="card-body">
                 <center>  
                   <h3 className="subtitle">WITHDRAWAL FEE</h3>
-                  <h3 className="value-text">2%</h3>
+                  <h3 className="value-text">0.5%</h3>
                 </center>
                 </div>
               </div>
@@ -475,8 +475,8 @@ return(
               <div className="card">
                 <div className="card-body">
                   <center>  
-                    <h3 className="subtitle">DEPOSIT FEE</h3>
-                    <h4 className="value-text">6%</h4>
+                    <h3 className="subtitle">Claim Yield Fee</h3>
+                    <h4 className="value-text">1%</h4>
                   </center>
                 </div>
             </div>
@@ -500,18 +500,6 @@ return(
                       <tr>
                         <td><h5 className="content-text"><b>DEPOSITED</b></h5></td>
                         <td style={{textAlign:"right"}}><h5 className="value-text">{Number(userInvestment).toFixed(2)} BUSD</h5></td>
-                      </tr>
-                      <tr>
-                        <td><h5 className="content-text"><b>5x PROFIT</b></h5></td>
-                        <td style={{textAlign:"right"}}><h5 className="value-text">{Number(userInvestment * 7).toFixed(2)} BUSD</h5></td>
-                      </tr>
-                      <tr>
-                        <td><h5 className="content-text"><b>5x REMAINING</b></h5></td>
-                        <td style={{textAlign:"right"}}><h5 className="value-text">{Number(userInvestment * 7 - totalWithdraw).toFixed(2)} BUSD</h5></td>
-                      </tr>
-                      <tr>
-                        <td><h5 className="content-text"><b>DAILY USER ROI</b></h5></td>
-                        <td style={{textAlign:"right"}}><h5 className="value-text">{Number(userDailyRoi).toFixed(2)} BUSD</h5></td>
                       </tr>
                       </tbody>
                     </table>     
@@ -550,12 +538,8 @@ return(
                <table className="table">
                  <tbody>
                     <tr>
-                      <td><h6 className="content-text14" style={{lineHeight: "20px"}}><b>DAILY REWARDS</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
+                      <td><h6 className="content-text14" style={{lineHeight: "20px"}}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
                       <td style={{textAlign:"right"}}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow}>CLAIM</button></td>
-                    </tr>
-                    <tr>
-                      <td><h6 className="content-text14" style={{lineHeight: "30px"}}><b>LAST CLAIM</b><br /><span className="value-text-12">{startTime}</span></h6></td>                      
-                      <td style={{textAlign:"right"}}><h6 className="content-text14" style={{lineHeight: "30px"}}><b>NEXT CLAIM</b><br /><span className="value-text-12">{deadline}</span></h6></td>
                     </tr>
                     <tr>
                       <td><h6 className="content-text14" style={{lineHeight: "20px"}}><b>50% AVAILABLE WITHDRAWAL</b> <br /><span className="value-text">{Number(approvedWithdraw).toFixed(3)} BUSD</span></h6></td>
