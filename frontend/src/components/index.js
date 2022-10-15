@@ -487,7 +487,7 @@ const Interface = () => {
             style={{ background: "#000", color: "#fff", width: isMobile ? "100%" : "" }}
             disabled={pendingTx}
             onClick={loadWeb3Modal}>
-            <i className="fas fa-wallet">
+            <i className="fas fa-wallet" style={{ marginRight: "12px" }}>
             </i>
             {connButtonText}
           </button>
