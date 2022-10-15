@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
 import web3ModalSetup from "./../helpers/web3ModalSetup";
 import Web3 from "web3";
 import getAbi from "../Abi";
@@ -10,6 +12,18 @@ import axios from "axios";
 
 const web3Modal = web3ModalSetup();
 // console.log("web3Modal: ", web3Modal);
+
+const LightTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: 'rgba(255, 255, 255, 0.8)',
+    boxShadow: theme.shadows[1],
+    fontSize: 18,
+  },
+}));
+
 
 const Interface = () => {
   const contractAddress = '0x131dfb16105f0b3d3b52ab0cce65cde22a4d5359';
@@ -55,6 +69,7 @@ const Interface = () => {
 
   const [address, setAddress] = useState("");
   const [roi, setRoi] = useState(8);
+  const [isTooltipDisplayed, setIsTooltipDisplayed] = useState(false);
 
   // const [playing, toggle] = useAudio(music);
 
@@ -585,7 +600,28 @@ const Interface = () => {
                   <span className="content-text13">Share your referral link to earn 10% of BUSD </span>
                   <br />
                   <br />
-                  <input type="text" value={refLink} className="form-control input-box" readOnly />
+                  <LightTooltip
+                    PopperProps={{
+                      disablePortal: true,
+                    }}
+                    open={isTooltipDisplayed}
+                    disableFocusListener
+                    disableHoverListener
+                    disableTouchListener
+                    title="Copied!"
+                    followCursor
+                  >
+                    <input type="text" value={refLink} className="form-control input-box" readOnly
+                      onClick={() => {
+                        if (navigator.clipboard) {
+                          navigator.clipboard.writeText(refLink)
+                          setIsTooltipDisplayed(true);
+                          setTimeout(() => {
+                            setIsTooltipDisplayed(false);
+                          }, 1500);
+                        }
+                      }} />
+                  </LightTooltip>
                 </form>
               </div>
             </div>
