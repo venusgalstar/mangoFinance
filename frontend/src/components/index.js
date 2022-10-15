@@ -190,14 +190,14 @@ const Interface = () => {
         // console.log("approvedAmount: ", approvedAmount);
         setUserApprovedAmount(approvedAmount);
 
-        let userDepositedAmount = await Abi.methods.amount(curAcount, 1).call();
+        let userDepositedAmount = await Abi.methods.amount(curAcount, 0).call();
         setUserDepositedAmount(userDepositedAmount.invested / 10e17);
 
-        let dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
-        setUserDailyRoi(dailyRoi / 10e17);
+        // let dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
+        // setUserDailyRoi(dailyRoi / 10e17);
 
-        let dailyReward = await Abi.methods.userReward(curAcount).call();
-        setDailyReward(dailyReward / 10e17);
+        // let dailyReward = await Abi.methods.userReward(curAcount).call();
+        // setDailyReward(dailyReward / 10e17);
       }
 
       // let owner = await Abi.methods.owner().call();
@@ -215,8 +215,8 @@ const Interface = () => {
         // let approvedWithdraw = await Abi.methods.approvedWithdrawal(curAcount).call();
         // setApprovedWithdraw(approvedWithdraw.amount / 10e17);
 
-        let totalWithdraw = await Abi.methods.totalWithdraw(curAcount).call();
-        setTotalWithdraw(totalWithdraw.amount / 10e17);
+        // let totalWithdraw = await Abi.methods.totalWithdraw(curAcount).call();
+        // setTotalWithdraw(totalWithdraw.amount / 10e17);
       }
     }
     Withdrawlconsole();
@@ -226,21 +226,21 @@ const Interface = () => {
   useEffect(() => {
     const TimeLine = async () => {
       if (isConnected && Abi) {
-        let claimTime = await Abi.methods.claimTime(curAcount).call();
-        if (claimTime.startTime > 0) {
-          let _claimStart = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.startTime + "000");
-          let _claimEnd = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.deadline + "000");
-          setClaimStartTime(_claimStart);
+      //   let claimTime = await Abi.methods.claimTime(curAcount).call();
+      //   if (claimTime.startTime > 0) {
+      //     let _claimStart = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.startTime + "000");
+      //     let _claimEnd = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.deadline + "000");
+      //     setClaimStartTime(_claimStart);
 
-          setClaimDeadline(_claimEnd);
+      //     setClaimDeadline(_claimEnd);
 
-          let weekly = await Abi.methods.weekly(curAcount).call();
-          let _start = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.startTime + "000");
-          let _end = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.deadline + "000");
+      //     let weekly = await Abi.methods.weekly(curAcount).call();
+      //     let _start = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.startTime + "000");
+      //     let _end = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.deadline + "000");
 
-          setLastWithdraw(_start);
-          setNextWithdraw(_end);
-        }
+      //     setLastWithdraw(_start);
+      //     setNextWithdraw(_end);
+      //   }
       }
     }
     TimeLine();
@@ -252,11 +252,11 @@ const Interface = () => {
     const ContractReward = async () => {
       if (isConnected && Abi) {
 
-        let refEarnedWithdraw = await Abi.methods.refferal(curAcount).call();
-        setReferralReward(refEarnedWithdraw.reward / 10e17);
+        // let refEarnedWithdraw = await Abi.methods.refferal(curAcount).call();
+        // setReferralReward(refEarnedWithdraw.reward / 10e17);
 
-        let refTotalWithdraw = await Abi.methods.refTotalWithdraw(curAcount).call();
-        setRefTotalWithdraw(refTotalWithdraw.totalWithdraw / 10e17);
+        // let refTotalWithdraw = await Abi.methods.refTotalWithdraw(curAcount).call();
+        // setRefTotalWithdraw(refTotalWithdraw.totalWithdraw / 10e17);
 
       }
     };
@@ -283,20 +283,20 @@ const Interface = () => {
     }
   };
 
-  const withDraw = async (e) => {
-    e.preventDefault();
-    if (isConnected && Abi) {
-      //  console.log("success")`1234567 
-      setPendingMessage("Withdrawing funds")
-      await Abi.methods.withdrawal().send({
-        from: curAcount,
-      });
-      setPendingMessage("Successfully Withdraw");
+  // const withDraw = async (e) => {
+  //   e.preventDefault();
+  //   if (isConnected && Abi) {
+  //     //  console.log("success")`1234567 
+  //     setPendingMessage("Withdrawing funds")
+  //     await Abi.methods.withdrawal().send({
+  //       from: curAcount,
+  //     });
+  //     setPendingMessage("Successfully Withdraw");
 
-    } else {
-      // console.log("connect wallet");
-    }
-  };
+  //   } else {
+  //     // console.log("connect wallet");
+  //   }
+  // };
 
   const refWithdraw = async (e) => {
     e.preventDefault();
