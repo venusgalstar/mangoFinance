@@ -28,7 +28,7 @@ const MIN_DEPOSIT_AMOUNT = 20
 
 
 const Interface = () => {
-  const contractAddress = '0xa7F6dE50133BD1fe8fAD89Baf8dc03F458266B31';
+  const contractAddress = '0x65623fB49DA935aa4e339bf25a544efD160d83cA';
   const isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
 
   const [Abi, setAbi] = useState();
@@ -515,7 +515,8 @@ const Interface = () => {
                     <a href="/docs/Whitepaper V1.pdf" target="_blank" rel="noreferrer" style={{ color: "#fff", textDecoration: "none" }}> DOCS </a>&nbsp;&nbsp;&nbsp;
                     <a href="https://twitter.com/MangoFinanceCEO" target="_blank" rel="noreferrer" style={{ color: "#fff", textDecoration: "none" }}> TWITTER </a>&nbsp;&nbsp;&nbsp;
                     <a href=" https://t.me/mangofinanceinc" target="_blank" rel="noreferrer" style={{ color: "#fff", textDecoration: "none" }}> TELEGRAM </a>&nbsp;&nbsp;&nbsp;
-                    <a href={"https://www.bscscan.com/address/" + contractAddress + "#code"} target="_blank" rel="noreferrer" style={{ color: "#fff", textDecoration: "none" }}> CONTRACT </a>&nbsp;&nbsp;&nbsp;
+                    <a href={"https://testnet.bscscan.com/address/" + contractAddress + "#code"} target="_blank" rel="noreferrer" style={{ color: "#fff", textDecoration: "none" }}> CONTRACT </a>&nbsp;&nbsp;&nbsp;
+                    {/* <a href={"https://www.bscscan.com/address/" + contractAddress + "#code"} target="_blank" rel="noreferrer" style={{ color: "#fff", textDecoration: "none" }}> CONTRACT </a>&nbsp;&nbsp;&nbsp; */}
                     <a href="https://georgestamp.xyz/" target="_blank" rel="noreferrer" style={{ color: "#fff", textDecoration: "none" }}> AUDIT </a>
                   </h2>
                   <p style={{ color: "#ffffff", fontSize: "14px", fontWeight: "200", marginBottom: "0px" }}>COPYRIGHT © 2022 TTNBANK Project All rights reserved!</p>
