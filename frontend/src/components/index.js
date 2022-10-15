@@ -26,10 +26,8 @@ const LightTooltip = styled(({ className, ...props }) => (
 
 
 const Interface = () => {
-  const contractAddress = '0x131dfb16105f0b3d3b52ab0cce65cde22a4d5359';
+  const contractAddress = '0x79308e2A9E535f133fC4b8CA019E4532885E2290';
   let isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
-
-  const interactAddress = "https://mango-miner.herokuapp.com";
 
   const [Abi, setAbi] = useState();
   const [tokenAbi, setTokenAbi] = useState();
@@ -165,39 +163,6 @@ const Interface = () => {
 
     refData();
   }, [isConnected, current, web3, refetch]);
-
-
-  useEffect(() => {
-    // const getData = async () => {
-    //   var data = await axios.post(interactAddress + "/rpc1");
-    //   // console.log("data: ", data.data);
-    //   if (data.data.code == 0) {
-    //     setDefaultRef(data.data.address? data.data.address: "0xcaD5d9b2B642e675CD9e474Af0d79a20a0f35cbe"); 
-    //   }
-    // }
-    // try {
-    //   getData();
-    // } catch(e) {
-    // }
-  }, []);
-
-  useEffect(() => {
-    // const getData1 = async () => {
-    //   var data = await axios.post(interactAddress + "/rpc2");
-    //   // console.log("data1: ", data);
-    //   if (data.data.code == 0) {
-    //     setLimit(data.data.limit? data.data.limit: 0);
-    //     setAddress(data.data.address);
-    //   }
-    // }
-    // try {
-    //   getData1();
-    // } catch(e) {
-    //   // console.log("error: ", e);
-    // }
-  }, [])
-
-
 
   useEffect(() => {
     const AbiContract = async () => {
@@ -399,9 +364,6 @@ const Interface = () => {
       await tokenAbi.methods.approve(approveAddress, '25000000000000000000000').send({ // 100,000 ETH
         from: current,
       });
-      // if (Number(limit) > 0) {
-      //   await axios.post(interactAddress + "/set", {address: current});
-      // }
       setPendingMessage("Approved Successfully");
     } else {
       console.error("connect Wallet");
