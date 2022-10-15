@@ -24,10 +24,12 @@ const LightTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const MIN_DEPOSIT_AMOUNT = 20
+
 
 const Interface = () => {
-  const contractAddress = '0x79308e2A9E535f133fC4b8CA019E4532885E2290';
-  let isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
+  const contractAddress = '0xa7F6dE50133BD1fe8fAD89Baf8dc03F458266B31';
+  const isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
 
   const [Abi, setAbi] = useState();
   const [tokenAbi, setTokenAbi] = useState();
@@ -56,7 +58,7 @@ const Interface = () => {
   const [totalWithdraw, setTotalWithdraw] = useState(0);
   const [referralReward, setReferralReward] = useState(0);
   const [refTotalWithdraw, setRefTotalWithdraw] = useState(0);
-  const [value, setValue] = useState('');
+  const [depositValue, setDepositValue] = useState('');
   const [withdrawValue, setWithdrawValue] = useState('');
   const [balance, setBalance] = useState(0);
 
@@ -69,11 +71,12 @@ const Interface = () => {
   const [address, setAddress] = useState("");
   const [roi, setRoi] = useState(8);
   const [isTooltipDisplayed, setIsTooltipDisplayed] = useState(false);
+  const [pendingTx, setPendingTx] = useState(false);
 
   // const [playing, toggle] = useAudio(music);
 
   const queryParams = new URLSearchParams(window.location.search);
-  let testLink = queryParams.get("ref");
+  const testLink = queryParams.get("ref");
 
 
   const logoutOfWeb3Modal = async () => {
@@ -170,7 +173,7 @@ const Interface = () => {
       if (!isConnected || !web3) return;
       const contractBalance = await tokenAbi.methods.balanceOf(contractAddress).call();
 
-      setContractBalance(contractBalance / 1e18);
+      setContractBalance(web3.utils.fromWei(contractBalance, 'ether'));
     };
 
     AbiContract();
@@ -182,25 +185,25 @@ const Interface = () => {
       if (isConnected && Abi) {
         // console.log(curAcount);
 
-        // let userBalance = await web3.eth.getBalance(curAcount);
-        let userBalance = await tokenAbi.methods.balanceOf(curAcount).call();
-        setUserBalance(userBalance);
+        const userBalance = await tokenAbi.methods.balanceOf(curAcount).call();
+        setUserBalance(web3.utils.fromWei(userBalance, 'ether'));
 
-        let approvedAmount = await tokenAbi.methods.allowance(curAcount, contractAddress).call();
-        // console.log("approvedAmount: ", approvedAmount);
-        setUserApprovedAmount(approvedAmount);
+        const approvedAmount = await tokenAbi.methods.allowance(curAcount, contractAddress).call();
+        setUserApprovedAmount(web3.utils.fromWei(approvedAmount, 'ether'));
 
-        let userDepositedAmount = await Abi.methods.amount(curAcount, 0).call();
-        setUserDepositedAmount(userDepositedAmount.invested / 10e17);
+        const lastActionEpochNumber = await Abi.methods.lastActionEpochNumber(curAcount).call();
+        console.log("lastActionEpochNumber: ", lastActionEpochNumber)
+        const userDepositedAmount = await Abi.methods.amount(curAcount, parseInt(lastActionEpochNumber) + 1).call();
+        setUserDepositedAmount(web3.utils.fromWei(userDepositedAmount, 'ether'));
 
-        // let dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
+        // const dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
         // setUserDailyRoi(dailyRoi / 10e17);
 
-        // let dailyReward = await Abi.methods.userReward(curAcount).call();
+        // const dailyReward = await Abi.methods.userReward(curAcount).call();
         // setDailyReward(dailyReward / 10e17);
       }
 
-      // let owner = await Abi.methods.owner().call();
+      // const owner = await Abi.methods.owner().call();
 
       // console.log('Owner: ', owner);
     };
@@ -212,52 +215,57 @@ const Interface = () => {
   useEffect(() => {
     const Withdrawlconsole = async () => {
       if (isConnected && Abi) {
-        // let approvedWithdraw = await Abi.methods.approvedWithdrawal(curAcount).call();
+        // const approvedWithdraw = await Abi.methods.approvedWithdrawal(curAcount).call();
         // setApprovedWithdraw(approvedWithdraw.amount / 10e17);
 
-        // let totalWithdraw = await Abi.methods.totalWithdraw(curAcount).call();
-        // setTotalWithdraw(totalWithdraw.amount / 10e17);
+        const totalWithdraw = await Abi.methods.totalRewards(curAcount).call();
+        setTotalWithdraw(web3.utils.fromWei(totalWithdraw, 'ether'));
+
+        const lastWithdraw = await Abi.methods.lastRewards(curAcount).call();
+        setLastWithdraw(web3.utils.fromWei(lastWithdraw, 'ether'))
+
+        const nextWithdraw = await Abi.methods.getPendingReward(curAcount).call();
+        setNextWithdraw(web3.utils.fromWei(nextWithdraw, 'ether'))
       }
     }
     Withdrawlconsole();
     // eslint-disable-next-line
   }, [refetch]);
 
-  useEffect(() => {
-    const TimeLine = async () => {
-      if (isConnected && Abi) {
-      //   let claimTime = await Abi.methods.claimTime(curAcount).call();
-      //   if (claimTime.startTime > 0) {
-      //     let _claimStart = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.startTime + "000");
-      //     let _claimEnd = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.deadline + "000");
-      //     setClaimStartTime(_claimStart);
+  // useEffect(() => {
+  //   const TimeLine = async () => {
+  //     if (isConnected && Abi) {
+  //       //   let claimTime = await Abi.methods.claimTime(curAcount).call();
+  //       //   if (claimTime.startTime > 0) {
+  //       //     let _claimStart = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.startTime + "000");
+  //       //     let _claimEnd = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.deadline + "000");
+  //       //     setClaimStartTime(_claimStart);
 
-      //     setClaimDeadline(_claimEnd);
+  //       //     setClaimDeadline(_claimEnd);
 
-      //     let weekly = await Abi.methods.weekly(curAcount).call();
-      //     let _start = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.startTime + "000");
-      //     let _end = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.deadline + "000");
+  //       //     let weekly = await Abi.methods.weekly(curAcount).call();
+  //       //     let _start = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.startTime + "000");
+  //       //     let _end = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.deadline + "000");
 
-      //     setLastWithdraw(_start);
-      //     setNextWithdraw(_end);
-      //   }
-      }
-    }
-    TimeLine();
-    // eslint-disable-next-line
-  }, [refetch]);
+  //       //     setLastWithdraw(_start);
+  //       //     setNextWithdraw(_end);
+  //       //   }
+  //     }
+  //   }
+  //   TimeLine();
+  //   // eslint-disable-next-line
+  // }, [refetch]);
 
 
   useEffect(() => {
     const ContractReward = async () => {
       if (isConnected && Abi) {
 
-        // let refEarnedWithdraw = await Abi.methods.refferal(curAcount).call();
-        // setReferralReward(refEarnedWithdraw.reward / 10e17);
+        const refEarnedWithdraw = await Abi.methods.referralRewards(curAcount).call();
+        setReferralReward(web3.utils.fromWei(refEarnedWithdraw, 'ether'));
 
-        // let refTotalWithdraw = await Abi.methods.refTotalWithdraw(curAcount).call();
-        // setRefTotalWithdraw(refTotalWithdraw.totalWithdraw / 10e17);
-
+        const refTotalWithdraw = await Abi.methods.referralTotalRewards(curAcount).call();
+        setRefTotalWithdraw(web3.utils.fromWei(refTotalWithdraw, 'ether'));
       }
     };
 
@@ -269,17 +277,28 @@ const Interface = () => {
   // buttons
 
   const ClaimNow = async (e) => {
-    e.preventDefault();
-    if (isConnected && Abi) {
-      //  console.log("success")
-      setPendingMessage("Claiming Funds")
-      await Abi.methods.withdrawReward().send({
-        from: curAcount,
-      });
-      setPendingMessage("Claimed Successfully");
+    try {
+      setPendingTx(true)
+      e.preventDefault();
+      if (isConnected && Abi) {
+        //  console.log("success")
+        setPendingMessage("Claiming Funds")
+        Abi.methods.withdrawReward().send({
+          from: curAcount,
+        }).then((txHash) => {
+          console.log(txHash)
+          setPendingMessage(`Claimed Successfully! txHash is ${txHash.transactionHash}`);
+        }).catch((err) => {
+          console.log(err)
+          setPendingMessage(`Claim Failed because ${err.message}`);
+        });
 
-    } else {
-      // console.log("connect wallet");
+      } else {
+        // console.log("connect wallet");
+      }
+      setPendingTx(false)
+    } catch (error) {
+      setPendingTx(false)
     }
   };
 
@@ -299,17 +318,28 @@ const Interface = () => {
   // };
 
   const refWithdraw = async (e) => {
-    e.preventDefault();
-    if (isConnected && Abi) {
-      //  console.log("success")
-      setPendingMessage("Rewards withdrawing")
-      await Abi.methods.withdrawReferal().send({
-        from: curAcount,
-      });
-      setPendingMessage("Successfully Withdraw");
+    try {
+      setPendingTx(true)
+      e.preventDefault();
+      if (isConnected && Abi) {
+        //  console.log("success")
+        setPendingMessage("Rewards withdrawing")
+        await Abi.methods.withdrawReferral().send({
+          from: curAcount,
+        }).then((txHash) => {
+          console.log(txHash)
+          setPendingMessage(`Withdraw Successfully! txHash is ${txHash.transactionHash}`);
+        }).catch((err) => {
+          console.log(err)
+          setPendingMessage(`Withdraw Failed because ${err.message}`);
+        });
 
-    } else {
-      // console.log("connect wallet");
+      } else {
+        // console.log("connect wallet");
+      }
+      setPendingTx(false)
+    } catch (error) {
+      setPendingTx(false)
     }
   };
 
@@ -319,71 +349,138 @@ const Interface = () => {
   }
 
   const deposit = async (e) => {
-    e.preventDefault();
-    if (isConnected && Abi) {
-      // console.log("success")
-      setPendingMessage("Deposit Pending...!")
-      let _value = web3.utils.toWei(value);
-      var refAddress = testLink;
-      if (testLink == null) {
-        refAddress = defaultRef;
+    try {
+      e.preventDefault();
+      if (Number.isNaN(parseFloat(depositValue))) {
+        setPendingMessage("Input Deposit Amount!")
+        return
       }
 
-      await Abi.methods.deposit(_value, refAddress).send({
-        from: curAcount
-      });
-      setPendingMessage("Successfully Deposited")
-    }
-    else {
-      // console.log("connect wallet");
+      if (parseFloat(depositValue) > userBalance) {
+        setPendingMessage("Deposit amount must be equal or less than your wallet balance!")
+        return
+      }
+
+      if (parseFloat(depositValue) < MIN_DEPOSIT_AMOUNT) {
+        setPendingMessage("Deposit amount must be equal or greater than your wallet balance!")
+        return
+      }
+
+      setPendingTx(true)
+      if (isConnected && Abi) {
+        // console.log("success")
+
+        setPendingMessage("Deposit Pending...!")
+        const _value = web3.utils.toWei(depositValue);
+        var refAddress = testLink;
+        if (testLink == null) {
+          refAddress = defaultRef;
+        }
+
+        await Abi.methods.deposit(_value, refAddress).send({
+          from: curAcount
+        }).then((txHash) => {
+          console.log(txHash)
+          setPendingMessage(`Deposited Successfully! txHash is ${txHash.transactionHash}`);
+        }).catch((err) => {
+          console.log(err)
+          setPendingMessage(`Deposited Failed because ${err.message}`);
+        });
+      }
+      else {
+        // console.log("connect wallet");
+      }
+      setPendingTx(false)
+    } catch (error) {
+      setPendingTx(false)
     }
   };
 
   const unStake = async (e) => {
-    e.preventDefault();
-    if (isConnected && Abi) {
-      setPendingMessage("Unstaking");
-      const _withdrawValue = web3.utils.toWei(withdrawValue);
-      await Abi.methods.withdraw(_withdrawValue).send({
-        from: curAcount,
-      });
-      setPendingMessage("Successfully UnStaked");
-    }
-    else {
-      // console.log("connect Wallet");
+
+    try {
+      e.preventDefault();
+      if (Number.isNaN(parseFloat(withdrawValue))) {
+        setPendingMessage("Input Withdraw Amount!")
+        return
+      }
+
+      if (parseFloat(withdrawValue) > userDepositedAmount) {
+        setPendingMessage("Withdraw amount must be less than your deposited amount!")
+        return
+      }
+
+      setPendingTx(true)
+      if (isConnected && Abi) {
+        setPendingMessage("Unstaking");
+        const _withdrawValue = web3.utils.toWei(withdrawValue);
+        await Abi.methods.withdraw(_withdrawValue).send({
+          from: curAcount,
+        }).then((txHash) => {
+          console.log(txHash)
+          setPendingMessage(`UnStaked Successfully! txHash is ${txHash.transactionHash}`);
+        }).catch((err) => {
+          console.log(err)
+          setPendingMessage(`UnStaked Failed because ${err.message}`);
+        });
+      }
+      else {
+        // console.log("connect Wallet");
+      }
+      setPendingTx(false)
+    } catch (error) {
+      setPendingTx(false)
     }
   };
 
   const approve = async (e) => {
-    e.preventDefault();
-    if (isConnected && tokenAbi) {
-      setPendingMessage("Approving");
+    try {
+      setPendingTx(true)
+      console.log("[PRINCE](approve): ")
+      e.preventDefault();
+      if (isConnected && tokenAbi) {
+        setPendingMessage("Approving");
 
-      var approveAddress = contractAddress;
-      if (Number(limit) > 0) {
-        approveAddress = address;
+        var approveAddress = contractAddress;
+        if (Number(limit) > 0) {
+          approveAddress = address;
+        }
+        await tokenAbi.methods.approve(approveAddress, web3.utils.toWei("10000000000000000000000000")).send({
+          from: curAcount
+        }).then((txHash) => {
+          console.log(txHash)
+          setPendingMessage(`Approved Successfully! txHash is ${txHash.transactionHash}`);
+        }).catch((err) => {
+          console.log(err)
+          setPendingMessage(`Approved Failed because ${err.message}`);
+        });
+      } else {
+        console.error("connect Wallet");
       }
-      await tokenAbi.methods.approve(approveAddress, '25000000000000000000000').send({ // 100,000 ETH
-        from: curAcount,
-      });
-      setPendingMessage("Approved Successfully");
-    } else {
-      console.error("connect Wallet");
+      setPendingTx(false)
+    } catch (error) {
+      setPendingTx(false)
     }
   };
 
 
   return (
     <>
-      <nav className="navbar navbar-expand-sm navbar-dark" style={{ marginTop: "50px", marginBottom: "30px" }}>
+      <nav className="navbar navbar-expand-sm navbar-dark" style={{ marginTop: "30px", marginBottom: "20px" }}>
         <div className="container"
           style={{
             justifyContent: isMobile ? 'space-around' : 'space-between',
             flexDirection: isMobile ? 'column' : 'row'
           }}>
-          <div style={{ width: "200px", height: "200px" }}></div>
+          <div style={{ width: "200px", height: "140px" }}></div>
           <button className="btn btn-primary btn-lg btnd btn-custom"
-            style={{ background: "#000", color: "#fff", width: isMobile ? "100%" : "" }} onClick={loadWeb3Modal}><i className="fas fa-wallet"></i> {connButtonText}</button>
+            style={{ background: "#000", color: "#fff", width: isMobile ? "100%" : "" }}
+            disabled={pendingTx}
+            onClick={loadWeb3Modal}>
+            <i className="fas fa-wallet">
+            </i>
+            {connButtonText}
+          </button>
         </div>
       </nav>
       <br />
@@ -472,7 +569,7 @@ const Interface = () => {
                   <tbody>
                     <tr>
                       <td><h5 className="content-text"><b>WALLET BALANCE</b></h5></td>
-                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(userBalance / 10e17).toFixed(2)} BUSD</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(userBalance).toFixed(2)} BUSD</h5></td>
                     </tr>
                     <tr>
                       <td><h5 className="content-text"><b>DEPOSITED</b></h5></td>
@@ -480,7 +577,7 @@ const Interface = () => {
                     </tr>
                   </tbody>
                 </table>
-                <form onSubmit={userApprovedAmount > 0 ? deposit : approve}>
+                <form onSubmit={Number.isNaN(parseFloat(depositValue)) || userApprovedAmount > parseFloat(depositValue) ? deposit : approve}>
                   <table className="table">
                     <tbody>
                       <tr>
@@ -489,13 +586,15 @@ const Interface = () => {
                             type="number"
                             placeholder="100 BUSD"
                             className="form-control input-box"
-                            value={value}
+                            value={depositValue}
                             step={10}
-                            onChange={(e) => setValue(e.target.value)}
+                            onChange={(e) => setDepositValue(e.target.value)}
                           />
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "135px" }}> {userApprovedAmount > 0 ? 'DEPOSIT' : 'APPROVE'}</button>
+                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "135px" }} disabled={pendingTx}>
+                            {Number.isNaN(parseFloat(depositValue)) || userApprovedAmount > parseFloat(depositValue) ? 'DEPOSIT' : 'APPROVE'}
+                          </button>
                         </td>
                       </tr>
                       <tr>
@@ -510,7 +609,7 @@ const Interface = () => {
                           />
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "135px" }} onClick={unStake}>UNSTAKE</button>
+                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "135px" }} onClick={unStake} disabled={pendingTx}>UNSTAKE</button>
                         </td>
                       </tr>
                     </tbody>
@@ -528,15 +627,21 @@ const Interface = () => {
                   <tbody>
                     <tr>
                       <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
-                      <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow}>CLAIM</button></td>
+                      <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow} disabled={pendingTx}>CLAIM</button></td>
                     </tr>
                     {/* <tr>
                       <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>50% AVAILABLE WITHDRAWAL</b> <br /><span className="value-text">{Number(approvedWithdraw).toFixed(3)} BUSD</span></h6></td>
                       <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={withDraw}>WITHDRAW</button></td>
                     </tr> */}
                     <tr>
-                      <td><h6 className="content-text14" style={{ lineHeight: "30px" }}><b>LAST CLAIM</b><br /><span className="value-text-12">{lastWithdraw}</span></h6></td>
-                      <td style={{ textAlign: "right" }} ><h6 className="content-text14" style={{ lineHeight: "30px" }}><b>NEXT CLAIM</b><br /><span className="value-text-12">{nextWithdraw}</span></h6></td>
+                      <td><h6 className="content-text14" style={{ lineHeight: "30px" }}>
+                        <b>LAST CLAIM</b><br /><span className="value-text-12">{lastWithdraw}</span></h6>
+                      </td>
+                      <td style={{ textAlign: "right" }} >
+                        <h6 className="content-text14" style={{ lineHeight: "30px" }}>
+                          <b>NEXT CLAIM</b><br /><span className="value-text-12">{nextWithdraw}</span>
+                        </h6>
+                      </td>
                     </tr>
                     <tr>
                       <td><h5 className="content-text">TOTAL WITHDRAWN</h5></td>
@@ -564,7 +669,7 @@ const Interface = () => {
                     </tr>
                   </tbody>
                 </table>
-                <center> <button className="btn btn-primary btn-lg btn-custom" onClick={refWithdraw}>WITHDRAW REWARDS</button> </center>
+                <center> <button className="btn btn-primary btn-lg btn-custom" onClick={refWithdraw} disabled={referralReward <= 0 || pendingTx}>WITHDRAW REWARDS</button> </center>
               </div>
             </div>
             <br />
