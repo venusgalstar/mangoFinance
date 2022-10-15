@@ -495,14 +495,14 @@ const Interface = () => {
                           />
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "100px" }}> {userApprovedAmount > 0 ? 'DEPOSIT' : 'APPROVE'}</button>
+                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "135px" }}> {userApprovedAmount > 0 ? 'DEPOSIT' : 'APPROVE'}</button>
                         </td>
                       </tr>
                       <tr>
                         <td>
                           <input
                             type="number"
-                            placeholder="BUSD"
+                            placeholder="100 BUSD"
                             className="form-control input-box"
                             value={withdrawValue}
                             step={10}
@@ -510,7 +510,7 @@ const Interface = () => {
                           />
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "100px" }} onClick={unStake}>UNSTAKE</button>
+                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "135px" }} onClick={unStake}>UNSTAKE</button>
                         </td>
                       </tr>
                     </tbody>
