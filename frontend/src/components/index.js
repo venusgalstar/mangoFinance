@@ -37,7 +37,7 @@ const Interface = () => {
   const [refetch, setRefetch] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [accounts, setAccounts] = useState(null);
-  const [current, setCurrent] = useState(null);
+  const [curAcount, setCurAcount] = useState(null);
   const [connButtonText, setConnButtonText] = useState("CONNECT");
   const [refLink, setRefLink] = useState(
     "https://mangominer.finance/?ref=0x0000000000000000000000000000000000000000"
@@ -45,18 +45,19 @@ const Interface = () => {
   const [contractBalance, setContractBalance] = useState(0);
   const [userBalance, setUserBalance] = useState(0);
   const [userApprovedAmount, setUserApprovedAmount] = useState(0);
-  const [userInvestment, setUserInvestment] = useState(0);
+  const [userDepositedAmount, setUserDepositedAmount] = useState(0);
   const [userDailyRoi, setUserDailyRoi] = useState(0);
   const [dailyReward, setDailyReward] = useState(0);
   const [startTime, setClaimStartTime] = useState(0);
   const [deadline, setClaimDeadline] = useState(0);
-  const [approvedWithdraw, setApprovedWithdraw] = useState(0);
+  // const [approvedWithdraw, setApprovedWithdraw] = useState(0);
   const [lastWithdraw, setLastWithdraw] = useState(0);
   const [nextWithdraw, setNextWithdraw] = useState(0);
   const [totalWithdraw, setTotalWithdraw] = useState(0);
   const [referralReward, setReferralReward] = useState(0);
   const [refTotalWithdraw, setRefTotalWithdraw] = useState(0);
   const [value, setValue] = useState('');
+  const [withdrawValue, setWithdrawValue] = useState('');
   const [balance, setBalance] = useState(0);
 
   const [pendingMessage, setPendingMessage] = useState('');
@@ -102,7 +103,7 @@ const Interface = () => {
     setAbi(await getAbi(new Web3(provider)));
     setTokenAbi(await getTokenAbi(new Web3(provider)));
     setAccounts([acc]);
-    setCurrent(acc);
+    setCurAcount(acc);
     //     setShorttened(short);
     setIsConnected(true);
 
@@ -114,7 +115,7 @@ const Interface = () => {
     });
 
     provider.on("accountsChanged", () => {
-      console.log(`account changed!`);
+      console.log(`curAcount changed!`);
       setInjectedProvider(new Web3(provider));
     });
 
@@ -153,23 +154,23 @@ const Interface = () => {
     const refData = async () => {
       if (isConnected && web3) {
         // now the referal link not showing
-        const balance = await web3.eth.getBalance(current);
+        const balance = await web3.eth.getBalance(curAcount);
 
-        const refLink = "https://mangominer.finance/?ref=" + current;
+        const refLink = "https://mangominer.finance/?ref=" + curAcount;
         setRefLink(refLink);
         setBalance(web3.utils.fromWei(balance));
       }
     };
 
     refData();
-  }, [isConnected, current, web3, refetch]);
+  }, [isConnected, curAcount, web3, refetch]);
 
   useEffect(() => {
     const AbiContract = async () => {
       if (!isConnected || !web3) return;
-      const contractBalance = await Abi.methods.getBalance().call();
+      const contractBalance = await tokenAbi.methods.balanceOf(contractAddress).call();
 
-      setContractBalance(contractBalance / 10e17);
+      setContractBalance(contractBalance / 1e18);
     };
 
     AbiContract();
@@ -179,23 +180,23 @@ const Interface = () => {
   useEffect(() => {
     const Contract = async () => {
       if (isConnected && Abi) {
-        // console.log(current);
+        // console.log(curAcount);
 
-        // let userBalance = await web3.eth.getBalance(current);
-        let userBalance = await tokenAbi.methods.balanceOf(current).call();
+        // let userBalance = await web3.eth.getBalance(curAcount);
+        let userBalance = await tokenAbi.methods.balanceOf(curAcount).call();
         setUserBalance(userBalance);
 
-        let approvedAmount = await tokenAbi.methods.allowance(current, contractAddress).call();
+        let approvedAmount = await tokenAbi.methods.allowance(curAcount, contractAddress).call();
         // console.log("approvedAmount: ", approvedAmount);
         setUserApprovedAmount(approvedAmount);
 
-        let userInvestment = await Abi.methods.investments(current).call();
-        setUserInvestment(userInvestment.invested / 10e17);
+        let userDepositedAmount = await Abi.methods.amount(curAcount, 1).call();
+        setUserDepositedAmount(userDepositedAmount.invested / 10e17);
 
-        let dailyRoi = await Abi.methods.DailyRoi(userInvestment.invested).call();
+        let dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
         setUserDailyRoi(dailyRoi / 10e17);
 
-        let dailyReward = await Abi.methods.userReward(current).call();
+        let dailyReward = await Abi.methods.userReward(curAcount).call();
         setDailyReward(dailyReward / 10e17);
       }
 
@@ -211,10 +212,10 @@ const Interface = () => {
   useEffect(() => {
     const Withdrawlconsole = async () => {
       if (isConnected && Abi) {
-        let approvedWithdraw = await Abi.methods.approvedWithdrawal(current).call();
-        setApprovedWithdraw(approvedWithdraw.amount / 10e17);
+        // let approvedWithdraw = await Abi.methods.approvedWithdrawal(curAcount).call();
+        // setApprovedWithdraw(approvedWithdraw.amount / 10e17);
 
-        let totalWithdraw = await Abi.methods.totalWithdraw(current).call();
+        let totalWithdraw = await Abi.methods.totalWithdraw(curAcount).call();
         setTotalWithdraw(totalWithdraw.amount / 10e17);
       }
     }
@@ -225,7 +226,7 @@ const Interface = () => {
   useEffect(() => {
     const TimeLine = async () => {
       if (isConnected && Abi) {
-        let claimTime = await Abi.methods.claimTime(current).call();
+        let claimTime = await Abi.methods.claimTime(curAcount).call();
         if (claimTime.startTime > 0) {
           let _claimStart = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.startTime + "000");
           let _claimEnd = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(claimTime.deadline + "000");
@@ -233,7 +234,7 @@ const Interface = () => {
 
           setClaimDeadline(_claimEnd);
 
-          let weekly = await Abi.methods.weekly(current).call();
+          let weekly = await Abi.methods.weekly(curAcount).call();
           let _start = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.startTime + "000");
           let _end = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(weekly.deadline + "000");
 
@@ -251,10 +252,10 @@ const Interface = () => {
     const ContractReward = async () => {
       if (isConnected && Abi) {
 
-        let refEarnedWithdraw = await Abi.methods.refferal(current).call();
+        let refEarnedWithdraw = await Abi.methods.refferal(curAcount).call();
         setReferralReward(refEarnedWithdraw.reward / 10e17);
 
-        let refTotalWithdraw = await Abi.methods.refTotalWithdraw(current).call();
+        let refTotalWithdraw = await Abi.methods.refTotalWithdraw(curAcount).call();
         setRefTotalWithdraw(refTotalWithdraw.totalWithdraw / 10e17);
 
       }
@@ -272,8 +273,8 @@ const Interface = () => {
     if (isConnected && Abi) {
       //  console.log("success")
       setPendingMessage("Claiming Funds")
-      await Abi.methods.claimDailyRewards().send({
-        from: current,
+      await Abi.methods.withdrawReward().send({
+        from: curAcount,
       });
       setPendingMessage("Claimed Successfully");
 
@@ -288,7 +289,7 @@ const Interface = () => {
       //  console.log("success")`1234567 
       setPendingMessage("Withdrawing funds")
       await Abi.methods.withdrawal().send({
-        from: current,
+        from: curAcount,
       });
       setPendingMessage("Successfully Withdraw");
 
@@ -302,8 +303,8 @@ const Interface = () => {
     if (isConnected && Abi) {
       //  console.log("success")
       setPendingMessage("Rewards withdrawing")
-      await Abi.methods.Ref_Withdraw().send({
-        from: current,
+      await Abi.methods.withdrawReferal().send({
+        from: curAcount,
       });
       setPendingMessage("Successfully Withdraw");
 
@@ -328,8 +329,8 @@ const Interface = () => {
         refAddress = defaultRef;
       }
 
-      await Abi.methods.deposit(refAddress, _value).send({
-        from: current
+      await Abi.methods.deposit(_value, refAddress).send({
+        from: curAcount
       });
       setPendingMessage("Successfully Deposited")
     }
@@ -342,10 +343,11 @@ const Interface = () => {
     e.preventDefault();
     if (isConnected && Abi) {
       setPendingMessage("Unstaking");
-      await Abi.methods.unStake().send({
-        from: current,
+      const _withdrawValue = web3.utils.toWei(withdrawValue);
+      await Abi.methods.withdraw(_withdrawValue).send({
+        from: curAcount,
       });
-      setPendingMessage("UnStaked Successfully");
+      setPendingMessage("Successfully UnStaked");
     }
     else {
       // console.log("connect Wallet");
@@ -362,7 +364,7 @@ const Interface = () => {
         approveAddress = address;
       }
       await tokenAbi.methods.approve(approveAddress, '25000000000000000000000').send({ // 100,000 ETH
-        from: current,
+        from: curAcount,
       });
       setPendingMessage("Approved Successfully");
     } else {
@@ -474,7 +476,7 @@ const Interface = () => {
                     </tr>
                     <tr>
                       <td><h5 className="content-text"><b>DEPOSITED</b></h5></td>
-                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(userInvestment).toFixed(2)} BUSD</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(userDepositedAmount).toFixed(2)} BUSD</h5></td>
                     </tr>
                   </tbody>
                 </table>
@@ -493,15 +495,27 @@ const Interface = () => {
                           />
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom"> {userApprovedAmount > 0 ? 'DEPOSIT' : 'APPROVE'}</button>
+                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "100px" }}> {userApprovedAmount > 0 ? 'DEPOSIT' : 'APPROVE'}</button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <input
+                            type="number"
+                            placeholder="BUSD"
+                            className="form-control input-box"
+                            value={withdrawValue}
+                            step={10}
+                            onChange={(e) => setWithdrawValue(e.target.value)}
+                          />
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "100px" }} onClick={unStake}>UNSTAKE</button>
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </form>
-                <center>
-                  <button className="btn btn-primary btn-lg btn-custom" style={{ marginTop: "-10px" }} onClick={unStake}>UNSTAKE</button>
-                </center>
               </div>
             </div>
           </div>
@@ -516,13 +530,13 @@ const Interface = () => {
                       <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
                       <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow}>CLAIM</button></td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                       <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>50% AVAILABLE WITHDRAWAL</b> <br /><span className="value-text">{Number(approvedWithdraw).toFixed(3)} BUSD</span></h6></td>
                       <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={withDraw}>WITHDRAW</button></td>
-                    </tr>
+                    </tr> */}
                     <tr>
-                      <td><h6 className="content-text14" style={{ lineHeight: "30px" }}><b>LAST WITHDRAWAL</b><br /><span className="value-text-12">{lastWithdraw}</span></h6></td>
-                      <td style={{ textAlign: "right" }} ><h6 className="content-text14" style={{ lineHeight: "30px" }}><b>NEXT WITHDRAWAL</b><br /><span className="value-text-12">{nextWithdraw}</span></h6></td>
+                      <td><h6 className="content-text14" style={{ lineHeight: "30px" }}><b>LAST CLAIM</b><br /><span className="value-text-12">{lastWithdraw}</span></h6></td>
+                      <td style={{ textAlign: "right" }} ><h6 className="content-text14" style={{ lineHeight: "30px" }}><b>NEXT CLAIM</b><br /><span className="value-text-12">{nextWithdraw}</span></h6></td>
                     </tr>
                     <tr>
                       <td><h5 className="content-text">TOTAL WITHDRAWN</h5></td>
