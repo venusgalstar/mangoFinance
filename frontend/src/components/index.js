@@ -278,8 +278,13 @@ const Interface = () => {
 
   const ClaimNow = async (e) => {
     try {
-      setPendingTx(true)
       e.preventDefault();
+      if (nextWithdraw <= 0) {
+        setPendingMessage("No Next Rewards!")
+        return
+      }
+
+      setPendingTx(true)
       if (isConnected && Abi) {
         //  console.log("success")
         setPendingMessage("Claiming Funds")
@@ -319,8 +324,13 @@ const Interface = () => {
 
   const refWithdraw = async (e) => {
     try {
-      setPendingTx(true)
       e.preventDefault();
+      if (referralReward <= 0) {
+        setPendingMessage("No Next Referral Rewards!")
+        return
+      }
+
+      setPendingTx(true)
       if (isConnected && Abi) {
         //  console.log("success")
         setPendingMessage("Rewards withdrawing")
