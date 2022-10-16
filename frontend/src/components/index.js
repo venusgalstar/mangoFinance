@@ -587,7 +587,7 @@ const Interface = () => {
                           />
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "135px" }} disabled={pendingTx}>
+                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "123px" }} disabled={pendingTx}>
                             {Number.isNaN(parseFloat(depositValue)) || userApprovedAmount > parseFloat(depositValue) ? 'DEPOSIT' : 'APPROVE'}
                           </button>
                         </td>
@@ -604,7 +604,7 @@ const Interface = () => {
                           />
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "135px" }} onClick={unStake} disabled={pendingTx}>UNSTAKE</button>
+                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "123px" }} onClick={unStake} disabled={pendingTx}>UNSTAKE</button>
                         </td>
                       </tr>
                     </tbody>
