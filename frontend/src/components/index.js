@@ -33,9 +33,12 @@ const DENOMINATOR = 10000
 const DENOMINATOR_PERCENT = 100
 
 const RPC_URL = "https://data-seed-prebsc-2-s2.binance.org:8545"
+const MAINNET = 56
+const ADMIN_ACCOUNT = '0x2Cc4467e7a94D55497B704a0acd90ACd1BF9A5af'
 
 const httpProvider = new Web3.providers.HttpProvider(RPC_URL)
 const web3NoAccount = new Web3(httpProvider)
+const isAddress = web3NoAccount.utils.isAddress
 const tokenAbiNoAccount = await getTokenAbi(web3NoAccount)
 const AbiNoAccount = await getAbi(web3NoAccount)
 
@@ -91,8 +94,6 @@ const Interface = () => {
 
   useEffect(() => {
     const referral = window.localStorage.getItem("REFERRAL")
-    const isAddress = web3NoAccount.utils.isAddress
-    const MAINNET = parseInt(MAINNET_CHAIN_ID)
 
     if (!isAddress(referral, MAINNET)) {
       if (isAddress(newReferral, MAINNET)) {
@@ -382,12 +383,11 @@ const Interface = () => {
 
         setPendingMessage("Deposit Pending...")
         const _value = web3NoAccount.utils.toWei(depositValue);
-        var refAddress = testLink;
-        if (testLink == null) {
-          refAddress = defaultRef;
-        }
 
-        await Abi.methods.deposit(_value, refAddress).send({
+        let referrer = window.localStorage.getItem("REFERRAL");
+        referrer = isAddress(referrer, MAINNET) ? referrer : ADMIN_ACCOUNT
+
+        await Abi.methods.deposit(_value, referrer).send({
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)
