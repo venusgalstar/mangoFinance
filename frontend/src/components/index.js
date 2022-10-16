@@ -546,7 +546,7 @@ const Interface = () => {
             <div className="card">
               <div className="card-body">
                 <center>
-                  <h3 className="subtitle">Currently APY</h3>
+                  <h3 className="subtitle">Current APY</h3>
                   <h3 className="value-text">{curAPY / DENOMINATOR_PERCENT}%</h3>
                 </center>
               </div>
