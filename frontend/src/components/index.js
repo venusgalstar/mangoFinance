@@ -32,6 +32,13 @@ const WITHDRAW_FEE = 50
 const DENOMINATOR = 10000
 const DENOMINATOR_PERCENT = 100
 
+const RPC_URL = "https://data-seed-prebsc-2-s2.binance.org:8545"
+
+const httpProvider = new Web3.providers.HttpProvider(RPC_URL)
+const web3NoAccount = new Web3(httpProvider)
+const tokenAbiNoAccount = await getTokenAbi(web3NoAccount)
+const AbiNoAccount = await getAbi(web3NoAccount)
+
 const Interface = () => {
   const contractAddress = '0x1a9375E5EC90e8B2b9Ca4959Ea6278376100BFa9';
   const isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
@@ -78,11 +85,26 @@ const Interface = () => {
   const [pendingTx, setPendingTx] = useState(false);
   const [curAPY, setCurAPY] = useState('0')
 
+  const queryString = window.location.search;
+  const parameters = new URLSearchParams(queryString);
+  const newReferral = parameters.get('ref');
+
+  useEffect(() => {
+    const referral = window.localStorage.getItem("REFERRAL")
+    const isAddress = web3NoAccount.utils.isAddress
+    const MAINNET = parseInt(MAINNET_CHAIN_ID)
+
+    if (!isAddress(referral, MAINNET)) {
+      if (isAddress(newReferral, MAINNET)) {
+        window.localStorage.setItem("REFERRAL", newReferral);
+      } else {
+        window.localStorage.setItem("REFERRAL", ADMIN_ACCOUNT);
+      }
+    }
+    console.log("[PRINCE](referral): ", referral);
+  }, [newReferral])
+
   // const [playing, toggle] = useAudio(music);
-
-  const queryParams = new URLSearchParams(window.location.search);
-  const testLink = queryParams.get("ref");
-
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -160,27 +182,31 @@ const Interface = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (isConnected && web3) {
+      const contractBalance = await tokenAbiNoAccount.methods.balanceOf(contractAddress).call();
+      setContractBalance(web3NoAccount.utils.fromWei(contractBalance, 'ether'));
+
+      const epochNumberVal = await AbiNoAccount.methods.epochNumber().call();
+      const curAPYVal = await AbiNoAccount.methods.apy(parseInt(epochNumberVal) + 1).call();
+      setCurAPY(curAPYVal)
+
+      if (curAcount) {
         const refLink = "https://mangominer.finance/?ref=" + curAcount;
         setRefLink(refLink);
-
-        const contractBalance = await tokenAbi.methods.balanceOf(contractAddress).call();
-        setContractBalance(web3.utils.fromWei(contractBalance, 'ether'));
       }
 
-      if (isConnected && Abi) {
+      if (isConnected && Abi && curAcount) {
         // console.log(curAcount);
 
         const userBalance = await tokenAbi.methods.balanceOf(curAcount).call();
-        setUserBalance(web3.utils.fromWei(userBalance, 'ether'));
+        setUserBalance(web3NoAccount.utils.fromWei(userBalance, 'ether'));
 
         const approvedAmount = await tokenAbi.methods.allowance(curAcount, contractAddress).call();
-        setUserApprovedAmount(web3.utils.fromWei(approvedAmount, 'ether'));
+        setUserApprovedAmount(web3NoAccount.utils.fromWei(approvedAmount, 'ether'));
 
         const lastActionEpochNumber = await Abi.methods.lastActionEpochNumber(curAcount).call();
         console.log("lastActionEpochNumber: ", lastActionEpochNumber)
         const userDepositedAmount = await Abi.methods.amount(curAcount, parseInt(lastActionEpochNumber) + 1).call();
-        setUserDepositedAmount(web3.utils.fromWei(userDepositedAmount, 'ether'));
+        setUserDepositedAmount(web3NoAccount.utils.fromWei(userDepositedAmount, 'ether'));
 
         // const dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
         // setUserDailyRoi(dailyRoi / 10e17);
@@ -192,23 +218,19 @@ const Interface = () => {
         // setApprovedWithdraw(approvedWithdraw.amount / 10e17);
 
         const totalWithdraw = await Abi.methods.totalRewards(curAcount).call();
-        setTotalWithdraw(web3.utils.fromWei(totalWithdraw, 'ether'));
+        setTotalWithdraw(web3NoAccount.utils.fromWei(totalWithdraw, 'ether'));
 
         const lastWithdraw = await Abi.methods.lastRewards(curAcount).call();
-        setLastWithdraw(web3.utils.fromWei(lastWithdraw, 'ether'))
+        setLastWithdraw(web3NoAccount.utils.fromWei(lastWithdraw, 'ether'))
 
         const nextWithdraw = await Abi.methods.getPendingReward(curAcount).call();
-        setNextWithdraw(web3.utils.fromWei(nextWithdraw, 'ether'))
+        setNextWithdraw(web3NoAccount.utils.fromWei(nextWithdraw, 'ether'))
 
         const refEarnedWithdraw = await Abi.methods.referralRewards(curAcount).call();
-        setReferralReward(web3.utils.fromWei(refEarnedWithdraw, 'ether'));
+        setReferralReward(web3NoAccount.utils.fromWei(refEarnedWithdraw, 'ether'));
 
         const refTotalWithdraw = await Abi.methods.referralTotalRewards(curAcount).call();
-        setRefTotalWithdraw(web3.utils.fromWei(refTotalWithdraw, 'ether'));
-
-        const epochNumberVal = await Abi.methods.epochNumber().call();
-        const curAPYVal = await Abi.methods.apy(parseInt(epochNumberVal) + 1).call();
-        setCurAPY(curAPYVal)
+        setRefTotalWithdraw(web3NoAccount.utils.fromWei(refTotalWithdraw, 'ether'));
       }
 
       // const owner = await Abi.methods.owner().call();
@@ -359,7 +381,7 @@ const Interface = () => {
         // console.log("success")
 
         setPendingMessage("Deposit Pending...")
-        const _value = web3.utils.toWei(depositValue);
+        const _value = web3NoAccount.utils.toWei(depositValue);
         var refAddress = testLink;
         if (testLink == null) {
           refAddress = defaultRef;
@@ -403,7 +425,7 @@ const Interface = () => {
       setPendingTx(true)
       if (isConnected && Abi) {
         setPendingMessage("Unstaking...");
-        const _withdrawValue = web3.utils.toWei(withdrawValue);
+        const _withdrawValue = web3NoAccount.utils.toWei(withdrawValue);
         await Abi.methods.withdraw(_withdrawValue).send({
           from: curAcount,
         }).then((txHash) => {
@@ -437,7 +459,7 @@ const Interface = () => {
         if (Number(limit) > 0) {
           approveAddress = address;
         }
-        await tokenAbi.methods.approve(approveAddress, web3.utils.toWei("10000000000000000000000000")).send({
+        await tokenAbi.methods.approve(approveAddress, web3NoAccount.utils.toWei("10000000000000000000000000")).send({
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)
