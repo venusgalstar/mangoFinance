@@ -176,7 +176,7 @@ const Interface = () => {
 
   const shortenAddr = (addr) => {
     if (!addr) return "";
-    const first = addr.substr(0, 3);
+    const first = addr.substr(0, 5);
     const last = addr.substr(38, 41);
     return first + "..." + last;
   };
@@ -490,7 +490,7 @@ const Interface = () => {
           }}>
           <div style={{ width: "200px", height: "140px" }}></div>
           <button className="btn btn-primary btn-lg btnd btn-custom"
-            style={{ background: "#000", color: "#fff", width: isMobile ? "100%" : "" }}
+            style={{ background: "#000", color: "#fff", width: "155px" }}
             disabled={pendingTx}
             onClick={loadWeb3Modal}>
             <i className="fas fa-wallet" style={{ marginRight: "12px" }}>
