@@ -301,7 +301,7 @@ const Interface = () => {
       setPendingTx(true)
       if (isConnected && Abi) {
         //  console.log("success")
-        setPendingMessage("Rewards withdrawing")
+        setPendingMessage("Referral Rewards withdrawing...")
         await Abi.methods.withdrawReferral().send({
           from: curAcount,
         }).then((txHash) => {
@@ -353,7 +353,7 @@ const Interface = () => {
       if (isConnected && Abi) {
         // console.log("success")
 
-        setPendingMessage("Deposit Pending...!")
+        setPendingMessage("Deposit Pending...")
         const _value = web3.utils.toWei(depositValue);
         var refAddress = testLink;
         if (testLink == null) {
@@ -395,7 +395,7 @@ const Interface = () => {
 
       setPendingTx(true)
       if (isConnected && Abi) {
-        setPendingMessage("Unstaking");
+        setPendingMessage("Unstaking...");
         const _withdrawValue = web3.utils.toWei(withdrawValue);
         await Abi.methods.withdraw(_withdrawValue).send({
           from: curAcount,
@@ -422,7 +422,7 @@ const Interface = () => {
       console.log("[PRINCE](approve): ")
       e.preventDefault();
       if (isConnected && tokenAbi) {
-        setPendingMessage("Approving");
+        setPendingMessage("Approving...");
 
         var approveAddress = contractAddress;
         if (Number(limit) > 0) {
