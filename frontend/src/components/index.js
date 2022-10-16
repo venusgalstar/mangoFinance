@@ -25,10 +25,14 @@ const LightTooltip = styled(({ className, ...props }) => (
 }));
 
 const MIN_DEPOSIT_AMOUNT = 20
-
+const MAX_DEPOSIT_AMOUNT = 25000
+const REFERRAL_PERCENT = 1000
+const DEPOSIT_FEE = 100
+const WITHDRAW_FEE = 50
+const DENOMINATOR_PERCENT = 100
 
 const Interface = () => {
-  const contractAddress = '0x0a2a884d35798e292c2a47aDC58CF6fb891A274c';
+  const contractAddress = '0x1a9375E5EC90e8B2b9Ca4959Ea6278376100BFa9';
   const isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
 
   const [Abi, setAbi] = useState();
@@ -60,7 +64,6 @@ const Interface = () => {
   const [refTotalWithdraw, setRefTotalWithdraw] = useState(0);
   const [depositValue, setDepositValue] = useState('');
   const [withdrawValue, setWithdrawValue] = useState('');
-  const [balance, setBalance] = useState(0);
 
   const [pendingMessage, setPendingMessage] = useState('');
   const [calculate, setCalculator] = useState('');
@@ -72,6 +75,7 @@ const Interface = () => {
   const [roi, setRoi] = useState(8);
   const [isTooltipDisplayed, setIsTooltipDisplayed] = useState(false);
   const [pendingTx, setPendingTx] = useState(false);
+  const [curAPY, setCurAPY] = useState('0')
 
   // const [playing, toggle] = useAudio(music);
 
@@ -154,34 +158,15 @@ const Interface = () => {
   };
 
   useEffect(() => {
-    const refData = async () => {
+    const fetchData = async () => {
       if (isConnected && web3) {
-        // now the referal link not showing
-        const balance = await web3.eth.getBalance(curAcount);
-
         const refLink = "https://mangominer.finance/?ref=" + curAcount;
         setRefLink(refLink);
-        setBalance(web3.utils.fromWei(balance));
+
+        const contractBalance = await tokenAbi.methods.balanceOf(contractAddress).call();
+        setContractBalance(web3.utils.fromWei(contractBalance, 'ether'));
       }
-    };
 
-    refData();
-  }, [isConnected, curAcount, web3, refetch]);
-
-  useEffect(() => {
-    const AbiContract = async () => {
-      if (!isConnected || !web3) return;
-      const contractBalance = await tokenAbi.methods.balanceOf(contractAddress).call();
-
-      setContractBalance(web3.utils.fromWei(contractBalance, 'ether'));
-    };
-
-    AbiContract();
-  }, [isConnected, web3, Abi, refetch]);
-
-
-  useEffect(() => {
-    const Contract = async () => {
       if (isConnected && Abi) {
         // console.log(curAcount);
 
@@ -201,20 +186,7 @@ const Interface = () => {
 
         // const dailyReward = await Abi.methods.userReward(curAcount).call();
         // setDailyReward(dailyReward / 10e17);
-      }
 
-      // const owner = await Abi.methods.owner().call();
-
-      // console.log('Owner: ', owner);
-    };
-
-    Contract();
-    // eslint-disable-next-line
-  }, [refetch]);
-
-  useEffect(() => {
-    const Withdrawlconsole = async () => {
-      if (isConnected && Abi) {
         // const approvedWithdraw = await Abi.methods.approvedWithdrawal(curAcount).call();
         // setApprovedWithdraw(approvedWithdraw.amount / 10e17);
 
@@ -226,11 +198,25 @@ const Interface = () => {
 
         const nextWithdraw = await Abi.methods.getPendingReward(curAcount).call();
         setNextWithdraw(web3.utils.fromWei(nextWithdraw, 'ether'))
+
+        const refEarnedWithdraw = await Abi.methods.referralRewards(curAcount).call();
+        setReferralReward(web3.utils.fromWei(refEarnedWithdraw, 'ether'));
+
+        const refTotalWithdraw = await Abi.methods.referralTotalRewards(curAcount).call();
+        setRefTotalWithdraw(web3.utils.fromWei(refTotalWithdraw, 'ether'));
+
+        const epochNumberVal = await Abi.methods.epochNumber().call();
+        const curAPYVal = await Abi.methods.apy(parseInt(epochNumberVal) + 1).call();
+        setCurAPY(curAPYVal)
       }
-    }
-    Withdrawlconsole();
-    // eslint-disable-next-line
-  }, [refetch]);
+
+      // const owner = await Abi.methods.owner().call();
+
+      // console.log('Owner: ', owner);
+    };
+
+    fetchData();
+  }, [isConnected, web3, Abi, refetch, curAcount]);
 
   // useEffect(() => {
   //   const TimeLine = async () => {
@@ -255,24 +241,6 @@ const Interface = () => {
   //   TimeLine();
   //   // eslint-disable-next-line
   // }, [refetch]);
-
-
-  useEffect(() => {
-    const ContractReward = async () => {
-      if (isConnected && Abi) {
-
-        const refEarnedWithdraw = await Abi.methods.referralRewards(curAcount).call();
-        setReferralReward(web3.utils.fromWei(refEarnedWithdraw, 'ether'));
-
-        const refTotalWithdraw = await Abi.methods.referralTotalRewards(curAcount).call();
-        setRefTotalWithdraw(web3.utils.fromWei(refTotalWithdraw, 'ether'));
-      }
-    };
-
-    ContractReward();
-    // eslint-disable-next-line
-  }, [refetch]);
-
 
   // buttons
 
@@ -372,7 +340,12 @@ const Interface = () => {
       }
 
       if (parseFloat(depositValue) < MIN_DEPOSIT_AMOUNT) {
-        setPendingMessage("Deposit amount must be equal or greater than your wallet balance!")
+        setPendingMessage("Deposit amount must be equal or greater than minimum deposit amount!")
+        return
+      }
+
+      if (parseFloat(depositValue) > MAX_DEPOSIT_AMOUNT) {
+        setPendingMessage("Deposit amount must be equal or less than maximum deposit amount!")
         return
       }
 
@@ -541,7 +514,7 @@ const Interface = () => {
               <div className="card-body">
                 <center>
                   <h3 className="subtitle">Currently APY</h3>
-                  <h3 className="value-text">8%</h3>
+                  <h3 className="value-text">{curAPY}%</h3>
                 </center>
               </div>
             </div>
@@ -551,7 +524,7 @@ const Interface = () => {
               <div className="card-body">
                 <center>
                   <h3 className="subtitle">WITHDRAWAL FEE</h3>
-                  <h3 className="value-text">0.5%</h3>
+                  <h3 className="value-text">{WITHDRAW_FEE / DENOMINATOR_PERCENT}%</h3>
                 </center>
               </div>
             </div>
@@ -561,7 +534,7 @@ const Interface = () => {
               <div className="card-body">
                 <center>
                   <h3 className="subtitle">Claim Yield Fee</h3>
-                  <h4 className="value-text">1%</h4>
+                  <h4 className="value-text">{DEPOSIT_FEE / DENOMINATOR_PERCENT}%</h4>
                 </center>
               </div>
             </div>
@@ -636,23 +609,23 @@ const Interface = () => {
                 <hr />
                 <table className="table">
                   <tbody>
-                    <tr>
-                      <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
-                      <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow} disabled={pendingTx}>CLAIM</button></td>
-                    </tr>
                     {/* <tr>
                       <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>50% AVAILABLE WITHDRAWAL</b> <br /><span className="value-text">{Number(approvedWithdraw).toFixed(3)} BUSD</span></h6></td>
                       <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={withDraw}>WITHDRAW</button></td>
                     </tr> */}
                     <tr>
                       <td><h6 className="content-text14" style={{ lineHeight: "30px" }}>
-                        <b>LAST CLAIM</b><br /><span className="value-text-12">{lastWithdraw}</span></h6>
+                        <b>LAST CLAIM</b><br /><span className="value-text-12">{lastWithdraw} BUSD</span></h6>
                       </td>
                       <td style={{ textAlign: "right" }} >
                         <h6 className="content-text14" style={{ lineHeight: "30px" }}>
-                          <b>NEXT CLAIM</b><br /><span className="value-text-12">{nextWithdraw}</span>
+                          <b>NEXT CLAIM</b><br /><span className="value-text-12">{nextWithdraw} BUSD</span>
                         </h6>
                       </td>
+                    </tr>
+                    <tr>
+                      <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
+                      <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow} disabled={pendingTx}>CLAIM</button></td>
                     </tr>
                     <tr>
                       <td><h5 className="content-text">TOTAL WITHDRAWN</h5></td>
@@ -666,7 +639,7 @@ const Interface = () => {
           <div className="col-sm-4">
             <div className="card">
               <div className="card-body">
-                <h4 className="subtitle-normal"><b>REFERRAL REWARDS  10%</b></h4>
+                <h4 className="subtitle-normal"><b>REFERRAL REWARDS  {REFERRAL_PERCENT / DENOMINATOR_PERCENT}%</b></h4>
                 <hr />
                 <table className="table">
                   <tbody>
@@ -700,7 +673,7 @@ const Interface = () => {
                     disableFocusListener
                     disableHoverListener
                     disableTouchListener
-                    title="Copied!"
+                    title={`Copied!\n${refLink}`}
                     followCursor
                   >
                     <input type="text" value={refLink} className="form-control input-box" readOnly
@@ -710,7 +683,7 @@ const Interface = () => {
                           setIsTooltipDisplayed(true);
                           setTimeout(() => {
                             setIsTooltipDisplayed(false);
-                          }, 1500);
+                          }, 5000);
                         }
                       }} />
                   </LightTooltip>
