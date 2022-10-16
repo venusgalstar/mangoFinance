@@ -261,7 +261,9 @@ const Interface = () => {
           from: curAcount,
         }).then((txHash) => {
           console.log(txHash)
-          setPendingMessage(`Claimed Successfully! txHash is ${txHash.transactionHash}`);
+          const txHashString = `${txHash.transactionHash}`
+          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          setPendingMessage(`Claimed Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
           setPendingMessage(`Claim Failed because ${err.message}`);
@@ -307,7 +309,9 @@ const Interface = () => {
           from: curAcount,
         }).then((txHash) => {
           console.log(txHash)
-          setPendingMessage(`Withdraw Successfully! txHash is ${txHash.transactionHash}`);
+          const txHashString = `${txHash.transactionHash}`
+          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          setPendingMessage(`Withdraw Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
           setPendingMessage(`Withdraw Failed because ${err.message}`);
@@ -365,7 +369,9 @@ const Interface = () => {
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)
-          setPendingMessage(`Deposited Successfully! txHash is ${txHash.transactionHash}`);
+          const txHashString = `${txHash.transactionHash}`
+          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          setPendingMessage(`Deposited Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
           setPendingMessage(`Deposited Failed because ${err.message}`);
@@ -402,7 +408,9 @@ const Interface = () => {
           from: curAcount,
         }).then((txHash) => {
           console.log(txHash)
-          setPendingMessage(`UnStaked Successfully! txHash is ${txHash.transactionHash}`);
+          const txHashString = `${txHash.transactionHash}`
+          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          setPendingMessage(`UnStaked Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
           setPendingMessage(`UnStaked Failed because ${err.message}`);
@@ -433,7 +441,9 @@ const Interface = () => {
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)
-          setPendingMessage(`Approved Successfully! txHash is ${txHash.transactionHash}`);
+          const txHashString = `${txHash.transactionHash}`
+          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          setPendingMessage(`Approved Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
           setPendingMessage(`Approved Failed because ${err.message}`);
@@ -474,7 +484,7 @@ const Interface = () => {
             <>
               <center>
                 <div className="alert alert-warning alert-dismissible">
-                  <p onClick={closeBar} className="badge bg-dark" style={{ float: "right", cursor: "pointer" }}>X</p>
+                  <p onClick={closeBar} className="badge bg-dark" style={{ float: "right", cursor: "pointer", width: isMobile ? '200px' : '100%' }}>X</p>
                   {pendingMessage}
                 </div>
               </center>
@@ -712,7 +722,7 @@ const Interface = () => {
                       onChange={(e) => setCalculator(e.target.value)}
                     />
                     <br />
-                    <p className="content-text13">Amount of returns calculated on the basis of deposit amount.
+                    <p className="content-text18">Amount of returns calculated on the basis of deposit amount.
                       <br />
                       <b>Note:</b> Min deposit is 20 BUSD & max deposit is 25,000 BUSD.</p>
                   </div>

@@ -200,6 +200,14 @@ tr {
   color: #FFBB00;
 }
 
+.content-text18 {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 25px;
+  color: #FFBB00;
+}
+
 .btn-custom {
   justify-content: center;
   align-items: center;
