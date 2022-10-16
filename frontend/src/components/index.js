@@ -29,6 +29,7 @@ const MAX_DEPOSIT_AMOUNT = 25000
 const REFERRAL_PERCENT = 1000
 const DEPOSIT_FEE = 100
 const WITHDRAW_FEE = 50
+const DENOMINATOR = 10000
 const DENOMINATOR_PERCENT = 100
 
 const Interface = () => {
@@ -514,7 +515,7 @@ const Interface = () => {
               <div className="card-body">
                 <center>
                   <h3 className="subtitle">Currently APY</h3>
-                  <h3 className="value-text">{curAPY}%</h3>
+                  <h3 className="value-text">{curAPY / DENOMINATOR_PERCENT}%</h3>
                 </center>
               </div>
             </div>
@@ -718,9 +719,10 @@ const Interface = () => {
                   <div className="col-sm-6" style={{ textAlign: "right" }}>
                     <h3 className="subtitle-normal" style={{ fontSize: "16px" }}>ROI</h3>
                     <p className="content-text">
-                      DAILY RETURN: <span className="value-text">{Number(calculate / 100 * roi).toFixed(3)} BUSD</span> <br />
-                      WEEKLY RETURN: <span className="value-text">{Number(calculate / 100 * roi * 7).toFixed(3)} BUSD</span>  <br />
-                      MONTHLY RETURN: <span className="value-text">{Number(calculate / 100 * roi * 30).toFixed(3)} BUSD</span> </p>
+                      DAILY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR / 7).toFixed(3)} BUSD</span> <br />
+                      WEEKLY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR).toFixed(3)} BUSD</span>  <br />
+                      MONTHLY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR * 4.345).toFixed(3)} BUSD</span>  <br />
+                      Anual RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR * 52.1428).toFixed(3)} BUSD</span> </p>
                   </div>
                 </div>
               </div>
