@@ -1,4 +1,4 @@
-const address = "0xcCd64296051AA3307500beC97b83aD009490D05e";
+const address = "0x653Ffa9789CD4A861aA4D3AC68E37aDb73622025";
 
 const abi = [
   {
@@ -50,7 +50,7 @@ const abi = [
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "stakedAmount",
+        "name": "depositAmount",
         "type": "uint256"
       }
     ],
@@ -159,7 +159,7 @@ const abi = [
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "stakedAmount",
+        "name": "withdrawAmount",
         "type": "uint256"
       }
     ],

@@ -28,7 +28,7 @@ const MIN_DEPOSIT_AMOUNT = 20
 
 
 const Interface = () => {
-  const contractAddress = '0xcCd64296051AA3307500beC97b83aD009490D05e';
+  const contractAddress = '0x653Ffa9789CD4A861aA4D3AC68E37aDb73622025';
   const isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
 
   const [Abi, setAbi] = useState();
