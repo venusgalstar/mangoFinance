@@ -39,8 +39,8 @@ const ADMIN_ACCOUNT = '0x2Cc4467e7a94D55497B704a0acd90ACd1BF9A5af'
 const httpProvider = new Web3.providers.HttpProvider(RPC_URL)
 const web3NoAccount = new Web3(httpProvider)
 const isAddress = web3NoAccount.utils.isAddress
-const tokenAbiNoAccount = await getTokenAbi(web3NoAccount)
-const AbiNoAccount = await getAbi(web3NoAccount)
+const tokenAbiNoAccount = getTokenAbi(web3NoAccount)
+const AbiNoAccount = getAbi(web3NoAccount)
 
 const Interface = () => {
   const contractAddress = '0x1a9375E5EC90e8B2b9Ca4959Ea6278376100BFa9';
@@ -131,8 +131,8 @@ const Interface = () => {
     const short = shortenAddr(acc);
 
     setWeb3(new Web3(provider));
-    setAbi(await getAbi(new Web3(provider)));
-    setTokenAbi(await getTokenAbi(new Web3(provider)));
+    setAbi(getAbi(new Web3(provider)));
+    setTokenAbi(getTokenAbi(new Web3(provider)));
     setAccounts([acc]);
     setCurAcount(acc);
     //     setShorttened(short);
@@ -592,46 +592,48 @@ const Interface = () => {
                       <td><h5 className="content-text"><b>DEPOSITED</b></h5></td>
                       <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(userDepositedAmount).toFixed(2)} BUSD</h5></td>
                     </tr>
+                    <tr>
+                      <td>
+                        <input
+                          type="number"
+                          placeholder="100 BUSD"
+                          className="form-control input-box"
+                          value={depositValue}
+                          step={10}
+                          onChange={(e) => setDepositValue(e.target.value)}
+                        />
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <button className="btn btn-primary btn-lg btn-custom" style={{ width: "123px" }}
+                          onClick={Number.isNaN(parseFloat(depositValue)) || userApprovedAmount > parseFloat(depositValue) ? deposit : approve}
+                          disabled={pendingTx}
+                        >
+                          {Number.isNaN(parseFloat(depositValue)) || userApprovedAmount > parseFloat(depositValue) ? 'DEPOSIT' : 'APPROVE'}
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input
+                          type="number"
+                          placeholder="100 BUSD"
+                          className="form-control input-box"
+                          value={withdrawValue}
+                          step={10}
+                          onChange={(e) => setWithdrawValue(e.target.value)}
+                        />
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <button className="btn btn-primary btn-lg btn-custom" style={{ width: "123px" }}
+                          onClick={unStake}
+                          disabled={pendingTx}
+                        >
+                          UNSTAKE
+                        </button>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
-                <form onSubmit={Number.isNaN(parseFloat(depositValue)) || userApprovedAmount > parseFloat(depositValue) ? deposit : approve}>
-                  <table className="table">
-                    <tbody>
-                      <tr>
-                        <td>
-                          <input
-                            type="number"
-                            placeholder="100 BUSD"
-                            className="form-control input-box"
-                            value={depositValue}
-                            step={10}
-                            onChange={(e) => setDepositValue(e.target.value)}
-                          />
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "123px" }} disabled={pendingTx}>
-                            {Number.isNaN(parseFloat(depositValue)) || userApprovedAmount > parseFloat(depositValue) ? 'DEPOSIT' : 'APPROVE'}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <input
-                            type="number"
-                            placeholder="100 BUSD"
-                            className="form-control input-box"
-                            value={withdrawValue}
-                            step={10}
-                            onChange={(e) => setWithdrawValue(e.target.value)}
-                          />
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          <button className="btn btn-primary btn-lg btn-custom" style={{ width: "123px" }} onClick={unStake} disabled={pendingTx}>UNSTAKE</button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </form>
               </div>
             </div>
           </div>
