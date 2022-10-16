@@ -483,8 +483,8 @@ const Interface = () => {
           pendingMessage !== '' ?
             <>
               <center>
-                <div className="alert alert-warning alert-dismissible">
-                  <p onClick={closeBar} className="badge bg-dark" style={{ float: "right", cursor: "pointer", width: isMobile ? '200px' : '100%' }}>X</p>
+                <div className="alert alert-warning alert-dismissible" style={{ width: isMobile ? '270px' : '100%' }}>
+                  <p onClick={closeBar} className="badge bg-dark" style={{ float: "right", cursor: "pointer" }}>X</p>
                   {pendingMessage}
                 </div>
               </center>
@@ -625,25 +625,26 @@ const Interface = () => {
                       <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={withDraw}>WITHDRAW</button></td>
                     </tr> */}
                     <tr>
-                      <td><h6 className="content-text14" style={{ lineHeight: "30px" }}>
-                        <b>LAST CLAIM</b><br /><span className="value-text-12">{lastWithdraw} BUSD</span></h6>
-                      </td>
-                      <td style={{ textAlign: "right" }} >
-                        <h6 className="content-text14" style={{ lineHeight: "30px" }}>
-                          <b>NEXT CLAIM</b><br /><span className="value-text-12">{nextWithdraw} BUSD</span>
-                        </h6>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
-                      <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow} disabled={pendingTx}>CLAIM</button></td>
-                    </tr>
-                    <tr>
                       <td><h5 className="content-text">TOTAL WITHDRAWN</h5></td>
                       <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(totalWithdraw).toFixed(3)} BUSD</h5></td>
                     </tr>
+                    <tr>
+                      <td><h5 className="content-text">LAST CLAIM</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(lastWithdraw).toFixed(3)} BUSD</h5></td>
+                    </tr>
+                    <tr>
+                      <td><h5 className="content-text">NEXT CLAIM</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(nextWithdraw).toFixed(3)} BUSD</h5></td>
+                    </tr>
+                    {/* <tr>
+                      <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
+                      <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow} disabled={pendingTx}>CLAIM</button></td>
+                    </tr> */}
                   </tbody>
                 </table>
+                <center>
+                  <button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow} disabled={pendingTx}>CLAIM</button>
+                </center>
               </div>
             </div>
           </div>
