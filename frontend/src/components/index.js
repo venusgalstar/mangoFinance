@@ -143,11 +143,13 @@ const Interface = () => {
     provider.on("chainChanged", (chainId) => {
       console.log(`chain changed to ${chainId}! updating providers`);
       setInjectedProvider(new Web3(provider));
+      logoutOfWeb3Modal();
     });
 
     provider.on("accountsChanged", () => {
       console.log(`curAcount changed!`);
       setInjectedProvider(new Web3(provider));
+      logoutOfWeb3Modal();
     });
 
     // Subscribe to session disconnection
@@ -492,7 +494,7 @@ const Interface = () => {
           <button className="btn btn-primary btn-lg btnd btn-custom"
             style={{ background: "#000", color: "#fff", width: "155px" }}
             disabled={pendingTx}
-            onClick={loadWeb3Modal}>
+            onClick={isConnected ? logoutOfWeb3Modal : loadWeb3Modal}>
             <i className="fas fa-wallet" style={{ marginRight: "12px" }}>
             </i>
             {connButtonText}
