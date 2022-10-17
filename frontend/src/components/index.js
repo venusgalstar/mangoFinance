@@ -4,7 +4,23 @@ import { styled } from '@mui/material/styles';
 import web3ModalSetup from "./../helpers/web3ModalSetup";
 import Web3 from "web3";
 import BigNumber from 'bignumber.js'
-import getAbi from "../Abi";
+import getAbi, {
+  MIN_DEPOSIT_AMOUNT,
+  MAX_DEPOSIT_AMOUNT,
+  REFERRAL_PERCENT,
+  DEPOSIT_FEE,
+  WITHDRAW_FEE,
+  DENOMINATOR,
+  DENOMINATOR_PERCENT,
+  STAKE_DECIMALS,
+  REWARD_DECIMALS,
+  EPOCH_LENGTH,
+  contractAddress,
+  START_TIME,
+  RPC_URL,
+  MAINNET,
+  ADMIN_ACCOUNT
+} from "../Abi";
 import getTokenAbi from "../tokenAbi";
 // import logo from "./../assets/logo.png";
 // import logoMobile from "./../assets/logo.png";
@@ -25,20 +41,6 @@ const LightTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const MIN_DEPOSIT_AMOUNT = 20
-const MAX_DEPOSIT_AMOUNT = 25000
-const REFERRAL_PERCENT = 1000
-const DEPOSIT_FEE = 100
-const WITHDRAW_FEE = 50
-const DENOMINATOR = 10000
-const DENOMINATOR_PERCENT = 100
-const STAKE_DECIMALS = 18
-const REWARD_DECIMALS = 6
-
-const RPC_URL = "https://data-seed-prebsc-2-s2.binance.org:8545"
-const MAINNET = 56
-const ADMIN_ACCOUNT = '0x2Cc4467e7a94D55497B704a0acd90ACd1BF9A5af'
-
 const httpProvider = new Web3.providers.HttpProvider(RPC_URL)
 const web3NoAccount = new Web3(httpProvider)
 const isAddress = web3NoAccount.utils.isAddress
@@ -46,8 +48,6 @@ const isAddress = web3NoAccount.utils.isAddress
 const AbiNoAccount = getAbi(web3NoAccount)
 
 const Interface = () => {
-  // const contractAddress = '0x83225d2236108832DaEB496186eD5E63193295F1';
-  const contractAddress = '0x278Ef11D4EAdAF6AdBe7F45Fd598A017fC788D46';
   const isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
 
   const [Abi, setAbi] = useState();
@@ -89,6 +89,7 @@ const Interface = () => {
   const [isTooltipDisplayed, setIsTooltipDisplayed] = useState(false);
   const [pendingTx, setPendingTx] = useState(false);
   const [curAPY, setCurAPY] = useState('0')
+  const [curEpoch, setCurEpoch] = useState(0)
 
   const queryString = window.location.search;
   const parameters = new URLSearchParams(queryString);
@@ -187,6 +188,9 @@ const Interface = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const blockTimestamp = (await web3NoAccount.eth.getBlock('latest')).timestamp;
+      console.log("[PRINCE](blockTimestamp): ", blockTimestamp)
+      setCurEpoch(Math.floor((blockTimestamp - START_TIME) / EPOCH_LENGTH) + 1)
       const totalAmount = await AbiNoAccount.methods.totalAmount().call();
       setTotalAmount(new BigNumber(totalAmount).div(10 ** STAKE_DECIMALS));
 
@@ -548,7 +552,7 @@ const Interface = () => {
             <div className="card">
               <div className="card-body">
                 <center>
-                  <h3 className="subtitle">Current APY</h3>
+                  <h3 className="subtitle">CURRENT APY</h3>
                   <h3 className="value-text">{curAPY / DENOMINATOR_PERCENT}%</h3>
                 </center>
               </div>
@@ -558,12 +562,22 @@ const Interface = () => {
             <div className="card">
               <div className="card-body">
                 <center>
+                  <h3 className="subtitle">CURRENT EPOCH</h3>
+                  <h3 className="value-text">{curEpoch}</h3>
+                </center>
+              </div>
+            </div>
+          </div>
+          {/* <div className="col-sm-3">
+            <div className="card">
+              <div className="card-body">
+                <center>
                   <h3 className="subtitle">WITHDRAWAL FEE</h3>
                   <h3 className="value-text">{WITHDRAW_FEE / DENOMINATOR_PERCENT}%</h3>
                 </center>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="col-sm-3">
             <div className="card">
               <div className="card-body">

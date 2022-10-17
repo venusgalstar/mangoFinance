@@ -1,5 +1,21 @@
-// const address = "0x83225d2236108832DaEB496186eD5E63193295F1";
-const address = "0x278Ef11D4EAdAF6AdBe7F45Fd598A017fC788D46";
+export const MIN_DEPOSIT_AMOUNT = 20
+export const MAX_DEPOSIT_AMOUNT = 25000
+export const REFERRAL_PERCENT = 1000
+export const DEPOSIT_FEE = 100
+export const WITHDRAW_FEE = 50
+export const DENOMINATOR = 10000
+export const DENOMINATOR_PERCENT = 100
+export const STAKE_DECIMALS = 18
+export const REWARD_DECIMALS = 6
+export const EPOCH_LENGTH = 60
+// export const contractAddress = '0x83225d2236108832DaEB496186eD5E63193295F1';
+// export const START_TIME = 1665979239
+export const contractAddress = '0x278Ef11D4EAdAF6AdBe7F45Fd598A017fC788D46'; // without withdraw
+export const START_TIME = 1665986082 // without withdraw
+
+export const RPC_URL = "https://data-seed-prebsc-2-s2.binance.org:8545"
+export const MAINNET = 56
+export const ADMIN_ACCOUNT = '0x2Cc4467e7a94D55497B704a0acd90ACd1BF9A5af'
 
 const abi = [
 	{
@@ -1059,5 +1075,5 @@ const abi = [
 
 // @ts-ignore
 export default function getAbi(web3) {
-  return new web3.eth.Contract(abi, address);
+  return new web3.eth.Contract(abi, contractAddress);
 }
