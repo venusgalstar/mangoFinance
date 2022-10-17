@@ -2,17 +2,17 @@ export const MIN_DEPOSIT_AMOUNT = 20
 export const MAX_DEPOSIT_AMOUNT = 25000
 export const REFERRAL_PERCENT = 1000
 export const DEPOSIT_FEE = 100
-export const WITHDRAW_FEE = 50
+// export const WITHDRAW_FEE = 50
 export const DENOMINATOR = 10000
 export const DENOMINATOR_PERCENT = 100
 export const STAKE_DECIMALS = 'ether' // 18
-export const EPOCH_LENGTH = 300
-// export const contractAddress = '0x2039BaFBc73936D64Ce9d2dad42a036d9eD87feF'; // with withdraw
-// export const START_TIME = 1666027074
+export const EPOCH_LENGTH = 120
+// export const contractAddress = ''; // with withdraw
+// export const START_TIME = 
 // export const REWARD_DECIMALS = 'Mwei' // 6
 
-export const contractAddress = '0xad168818829E3a7C10c641836bcBD521C5766bda'; // without withdraw
-export const START_TIME = 1666025922 // without withdraw
+export const contractAddress = '0x6Df23308b842acC2D6a5585e40AEF176BC715958'; // without withdraw
+export const START_TIME = 1666049811 // without withdraw
 export const REWARD_DECIMALS = 'Gwei' // 9
 
 export const RPC_URL = "https://data-seed-prebsc-2-s2.binance.org:8545"

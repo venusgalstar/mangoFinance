@@ -8,7 +8,7 @@ import getAbi, {
   MAX_DEPOSIT_AMOUNT,
   REFERRAL_PERCENT,
   DEPOSIT_FEE,
-  WITHDRAW_FEE,
+  // WITHDRAW_FEE,
   DENOMINATOR,
   DENOMINATOR_PERCENT,
   STAKE_DECIMALS,
@@ -188,7 +188,7 @@ const Interface = () => {
     const fetchData = async () => {
       const blockTimestamp = (await web3NoAccount.eth.getBlock('latest')).timestamp;
       console.log("[PRINCE](blockTimestamp): ", blockTimestamp)
-      setCurEpoch(Math.floor((blockTimestamp - START_TIME) / EPOCH_LENGTH) + 1)
+      setCurEpoch(Math.floor((blockTimestamp - START_TIME) / EPOCH_LENGTH))
       const totalAmount = await AbiNoAccount.methods.totalAmount().call();
       setTotalAmount(web3NoAccount.utils.fromWei(totalAmount, STAKE_DECIMALS));
 
