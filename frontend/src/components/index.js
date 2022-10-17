@@ -287,7 +287,7 @@ const Interface = () => {
         }).then((txHash) => {
           console.log(txHash)
           const txHashString = `${txHash.transactionHash}`
-          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          const msgString = txHashString.substring(0, 8) + "..." + txHashString.substring(txHashString.length - 6)
           setPendingMessage(`Claimed Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
@@ -335,7 +335,7 @@ const Interface = () => {
         }).then((txHash) => {
           console.log(txHash)
           const txHashString = `${txHash.transactionHash}`
-          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          const msgString = txHashString.substring(0, 8) + "..." + txHashString.substring(txHashString.length - 6)
           setPendingMessage(`Withdraw Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
@@ -394,7 +394,7 @@ const Interface = () => {
         }).then((txHash) => {
           console.log(txHash)
           const txHashString = `${txHash.transactionHash}`
-          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          const msgString = txHashString.substring(0, 8) + "..." + txHashString.substring(txHashString.length - 6)
           setPendingMessage(`Deposited Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
@@ -433,7 +433,7 @@ const Interface = () => {
         }).then((txHash) => {
           console.log(txHash)
           const txHashString = `${txHash.transactionHash}`
-          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          const msgString = txHashString.substring(0, 8) + "..." + txHashString.substring(txHashString.length - 6)
           setPendingMessage(`UnStaked Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
@@ -466,7 +466,7 @@ const Interface = () => {
         }).then((txHash) => {
           console.log(txHash)
           const txHashString = `${txHash.transactionHash}`
-          const msgString = txHashString.substring(0, 5) + txHashString.substring(txHashString.length - 6)
+          const msgString = txHashString.substring(0, 8) + "..." + txHashString.substring(txHashString.length - 6)
           setPendingMessage(`Approved Successfully! txHash is ${msgString}`);
         }).catch((err) => {
           console.log(err)
