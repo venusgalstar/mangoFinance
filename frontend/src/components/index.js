@@ -465,7 +465,7 @@ const Interface = () => {
       if (isConnected && tokenAbi) {
         setPendingMessage("Approving...");
 
-        await tokenAbi.methods.approve(contractAddress, new BigNumber("10000000000000000000000000").times(10 ** STAKE_DECIMALS)).send({
+        await tokenAbi.methods.approve(contractAddress, new BigNumber(10).times(10 ** (52 + STAKE_DECIMALS))).send({
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)
