@@ -3,6 +3,7 @@ import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import web3ModalSetup from "./../helpers/web3ModalSetup";
 import Web3 from "web3";
+import BigNumber from 'bignumber.js'
 import getAbi from "../Abi";
 import getTokenAbi from "../tokenAbi";
 import logo from "./../assets/logo.png";
@@ -31,6 +32,8 @@ const DEPOSIT_FEE = 100
 const WITHDRAW_FEE = 50
 const DENOMINATOR = 10000
 const DENOMINATOR_PERCENT = 100
+const STAKE_DECIMALS = 18
+const REWARD_DECIMALS = 6
 
 const RPC_URL = "https://data-seed-prebsc-2-s2.binance.org:8545"
 const MAINNET = 56
@@ -59,7 +62,7 @@ const Interface = () => {
   const [refLink, setRefLink] = useState(
     "https://mangominer.finance/?ref=0x0000000000000000000000000000000000000000"
   );
-  const [contractBalance, setContractBalance] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [userBalance, setUserBalance] = useState(0);
   const [userApprovedAmount, setUserApprovedAmount] = useState(0);
   const [userDepositedAmount, setUserDepositedAmount] = useState(0);
@@ -185,8 +188,8 @@ const Interface = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const contractBalance = await tokenAbiNoAccount.methods.balanceOf(contractAddress).call();
-      setContractBalance(web3NoAccount.utils.fromWei(contractBalance, 'ether'));
+      const totalAmount = await AbiNoAccount.methods.totalAmount().call();
+      setTotalAmount(new BigNumber(totalAmount).div(10 ** STAKE_DECIMALS).toString());
 
       const epochNumberVal = await AbiNoAccount.methods.epochNumber().call();
       const curAPYVal = await AbiNoAccount.methods.apy(parseInt(epochNumberVal) + 1).call();
@@ -201,15 +204,15 @@ const Interface = () => {
         // console.log(curAcount);
 
         const userBalance = await tokenAbi.methods.balanceOf(curAcount).call();
-        setUserBalance(web3NoAccount.utils.fromWei(userBalance, 'ether'));
+        setUserBalance(new BigNumber(userBalance).div(10 ** STAKE_DECIMALS).toString());
 
         const approvedAmount = await tokenAbi.methods.allowance(curAcount, contractAddress).call();
-        setUserApprovedAmount(web3NoAccount.utils.fromWei(approvedAmount, 'ether'));
+        setUserApprovedAmount(new BigNumber(approvedAmount).div(10 ** STAKE_DECIMALS).toString());
 
         const lastActionEpochNumber = await Abi.methods.lastActionEpochNumber(curAcount).call();
         console.log("lastActionEpochNumber: ", lastActionEpochNumber)
         const userDepositedAmount = await Abi.methods.amount(curAcount, parseInt(lastActionEpochNumber) + 1).call();
-        setUserDepositedAmount(web3NoAccount.utils.fromWei(userDepositedAmount, 'ether'));
+        setUserDepositedAmount(new BigNumber(userDepositedAmount).div(10 ** STAKE_DECIMALS).toString());
 
         // const dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
         // setUserDailyRoi(dailyRoi / 10e17);
@@ -221,19 +224,19 @@ const Interface = () => {
         // setApprovedWithdraw(approvedWithdraw.amount / 10e17);
 
         const totalWithdraw = await Abi.methods.totalRewards(curAcount).call();
-        setTotalWithdraw(web3NoAccount.utils.fromWei(totalWithdraw, 'ether'));
+        setTotalWithdraw(new BigNumber(totalWithdraw).div(10 ** REWARD_DECIMALS).toString());
 
         const lastWithdraw = await Abi.methods.lastRewards(curAcount).call();
-        setLastWithdraw(web3NoAccount.utils.fromWei(lastWithdraw, 'ether'))
+        setLastWithdraw(new BigNumber(lastWithdraw).div(10 ** REWARD_DECIMALS).toString())
 
         const nextWithdraw = await Abi.methods.getPendingReward(curAcount).call();
-        setNextWithdraw(web3NoAccount.utils.fromWei(nextWithdraw, 'ether'))
+        setNextWithdraw(new BigNumber(nextWithdraw).div(10 ** REWARD_DECIMALS).toString())
 
         const refEarnedWithdraw = await Abi.methods.referralRewards(curAcount).call();
-        setReferralReward(web3NoAccount.utils.fromWei(refEarnedWithdraw, 'ether'));
+        setReferralReward(new BigNumber(refEarnedWithdraw).div(10 ** REWARD_DECIMALS).toString());
 
         const refTotalWithdraw = await Abi.methods.referralTotalRewards(curAcount).call();
-        setRefTotalWithdraw(web3NoAccount.utils.fromWei(refTotalWithdraw, 'ether'));
+        setRefTotalWithdraw(new BigNumber(refTotalWithdraw).div(10 ** REWARD_DECIMALS).toString());
       }
 
       // const owner = await Abi.methods.owner().call();
@@ -384,7 +387,7 @@ const Interface = () => {
         // console.log("success")
 
         setPendingMessage("Depositing...")
-        const _value = web3NoAccount.utils.toWei(depositValue);
+        const _value = new BigNumber(depositValue).times(10 ** STAKE_DECIMALS).toString();
 
         let referrer = window.localStorage.getItem("REFERRAL");
         referrer = isAddress(referrer, MAINNET) ? referrer : ADMIN_ACCOUNT
@@ -427,7 +430,7 @@ const Interface = () => {
       setPendingTx(true)
       if (isConnected && Abi) {
         setPendingMessage("Unstaking...");
-        const _withdrawValue = web3NoAccount.utils.toWei(withdrawValue);
+        const _withdrawValue = new BigNumber(withdrawValue).times(10 ** STAKE_DECIMALS).toString();
         await Abi.methods.withdraw(_withdrawValue).send({
           from: curAcount,
         }).then((txHash) => {
@@ -461,7 +464,7 @@ const Interface = () => {
         if (Number(limit) > 0) {
           approveAddress = address;
         }
-        await tokenAbi.methods.approve(approveAddress, web3NoAccount.utils.toWei("10000000000000000000000000")).send({
+        await tokenAbi.methods.approve(approveAddress, new BigNumber("10000000000000000000000000").times(10 ** STAKE_DECIMALS).toString()).send({
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)
@@ -538,8 +541,8 @@ const Interface = () => {
             <div className="card">
               <div className="card-body">
                 <center>
-                  <h3 className="subtitle">CONTRACT BALANCE</h3>
-                  <h3 className="value-text">{Number(contractBalance).toFixed(2)} BUSD</h3>
+                  <h3 className="subtitle">TOTAL VOLUME</h3>
+                  <h3 className="value-text">{Number(totalAmount).toFixed(2)} BUSD</h3>
                 </center>
               </div>
             </div>
@@ -652,18 +655,18 @@ const Interface = () => {
                     </tr> */}
                     <tr>
                       <td><h5 className="content-text">TOTAL WITHDRAWN</h5></td>
-                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(totalWithdraw).toFixed(3)} BUSD</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(totalWithdraw).toFixed(3)} TTNR</h5></td>
                     </tr>
                     <tr>
                       <td><h5 className="content-text">LAST CLAIM</h5></td>
-                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(lastWithdraw).toFixed(3)} BUSD</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(lastWithdraw).toFixed(3)} TTNR</h5></td>
                     </tr>
                     <tr>
                       <td><h5 className="content-text">NEXT CLAIM</h5></td>
-                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(nextWithdraw).toFixed(3)} BUSD</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(nextWithdraw).toFixed(3)} TTNR</h5></td>
                     </tr>
                     {/* <tr>
-                      <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} BUSD</span></h6></td>
+                      <td><h6 className="content-text14" style={{ lineHeight: "20px" }}><b>Weekly Yield</b> <br /> <span className="value-text">{Number(dailyReward).toFixed(3)}/{userDailyRoi} TTNR</span></h6></td>
                       <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-lg btn-custom" onClick={ClaimNow} disabled={pendingTx}>CLAIM</button></td>
                     </tr> */}
                   </tbody>
@@ -682,12 +685,12 @@ const Interface = () => {
                 <table className="table">
                   <tbody>
                     <tr>
-                      <td><h5 className="content-text">BUSD REWARDS</h5></td>
-                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(referralReward).toFixed(2)} BUSD</h5></td>
+                      <td><h5 className="content-text">TTNR REWARDS</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(referralReward).toFixed(2)} TTNR</h5></td>
                     </tr>
                     <tr>
                       <td><h5 className="content-text">TOTAL WITHDRAWN</h5></td>
-                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(refTotalWithdraw).toFixed(2)} BUSD</h5></td>
+                      <td style={{ textAlign: "right" }}><h5 className="value-text">{Number(refTotalWithdraw).toFixed(2)} TTNR</h5></td>
                     </tr>
                   </tbody>
                 </table>
@@ -700,7 +703,7 @@ const Interface = () => {
                 <h4 className="subtitle-normal"><b>REFERRAL LINK</b></h4>
                 <hr />
                 <form>
-                  <span className="content-text13">Share your referral link to earn 10% of BUSD </span>
+                  <span className="content-text13">Share your referral link to earn 10% of TTNR </span>
                   <br />
                   <br />
                   <LightTooltip
@@ -756,10 +759,10 @@ const Interface = () => {
                   <div className="col-sm-6" style={{ textAlign: "right" }}>
                     <h3 className="subtitle-normal" style={{ fontSize: "16px" }}>ROI</h3>
                     <p className="content-text">
-                      DAILY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR / 7).toFixed(3)} BUSD</span> <br />
-                      WEEKLY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR).toFixed(3)} BUSD</span>  <br />
-                      MONTHLY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR * 4.345).toFixed(3)} BUSD</span>  <br />
-                      Anual RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR * 52.1428).toFixed(3)} BUSD</span> </p>
+                      DAILY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR / 7).toFixed(3)} TTNR</span> <br />
+                      WEEKLY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR).toFixed(3)} TTNR</span>  <br />
+                      MONTHLY RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR * 4.345).toFixed(3)} TTNR</span>  <br />
+                      Anual RETURN: <span className="value-text">{Number(calculate * curAPY / DENOMINATOR * 52.1428).toFixed(3)} TTNR</span> </p>
                   </div>
                 </div>
               </div>
