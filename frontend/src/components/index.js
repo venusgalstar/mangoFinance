@@ -3,7 +3,6 @@ import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import web3ModalSetup from "./../helpers/web3ModalSetup";
 import Web3 from "web3";
-import BigNumber from 'bignumber.js'
 import getAbi, {
   MIN_DEPOSIT_AMOUNT,
   MAX_DEPOSIT_AMOUNT,
@@ -192,7 +191,7 @@ const Interface = () => {
       console.log("[PRINCE](blockTimestamp): ", blockTimestamp)
       setCurEpoch(Math.floor((blockTimestamp - START_TIME) / EPOCH_LENGTH) + 1)
       const totalAmount = await AbiNoAccount.methods.totalAmount().call();
-      setTotalAmount(new BigNumber(totalAmount).div(10 ** STAKE_DECIMALS));
+      setTotalAmount(web3NoAccount.utils.fromWei(totalAmount, STAKE_DECIMALS));
 
       const epochNumberVal = await AbiNoAccount.methods.epochNumber().call();
       const curAPYVal = await AbiNoAccount.methods.apy(parseInt(epochNumberVal) + 1).call();
@@ -207,15 +206,15 @@ const Interface = () => {
         // console.log(curAcount);
 
         const userBalance = await tokenAbi.methods.balanceOf(curAcount).call();
-        setUserBalance(new BigNumber(userBalance).div(10 ** STAKE_DECIMALS));
+        setUserBalance(web3NoAccount.utils.fromWei(userBalance, STAKE_DECIMALS));
 
         const approvedAmount = await tokenAbi.methods.allowance(curAcount, contractAddress).call();
-        setUserApprovedAmount(new BigNumber(approvedAmount).div(10 ** STAKE_DECIMALS));
+        setUserApprovedAmount(web3NoAccount.utils.fromWei(approvedAmount, STAKE_DECIMALS));
 
         const lastActionEpochNumber = await Abi.methods.lastActionEpochNumber(curAcount).call();
         console.log("lastActionEpochNumber: ", lastActionEpochNumber)
         const userDepositedAmount = await Abi.methods.amount(curAcount, parseInt(lastActionEpochNumber) + 1).call();
-        setUserDepositedAmount(new BigNumber(userDepositedAmount).div(10 ** STAKE_DECIMALS));
+        setUserDepositedAmount(web3NoAccount.utils.fromWei(userDepositedAmount, STAKE_DECIMALS));
 
         // const dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
         // setUserDailyRoi(dailyRoi / 10e17);
@@ -227,19 +226,19 @@ const Interface = () => {
         // setApprovedWithdraw(approvedWithdraw.amount / 10e17);
 
         const totalWithdraw = await Abi.methods.totalRewards(curAcount).call();
-        setTotalWithdraw(new BigNumber(totalWithdraw).div(10 ** REWARD_DECIMALS).toString());
+        setTotalWithdraw(web3NoAccount.utils.fromWei(totalWithdraw, REWARD_DECIMALS))
 
         const lastWithdraw = await Abi.methods.lastRewards(curAcount).call();
-        setLastWithdraw(new BigNumber(lastWithdraw).div(10 ** REWARD_DECIMALS).toString())
+        setLastWithdraw(web3NoAccount.utils.fromWei(lastWithdraw, REWARD_DECIMALS))
 
         const nextWithdraw = await Abi.methods.getPendingReward(curAcount).call();
-        setNextWithdraw(new BigNumber(nextWithdraw).div(10 ** REWARD_DECIMALS).toString())
+        setNextWithdraw(web3NoAccount.utils.fromWei(nextWithdraw, REWARD_DECIMALS))
 
         const refEarnedWithdraw = await Abi.methods.referralRewards(curAcount).call();
-        setReferralReward(new BigNumber(refEarnedWithdraw).div(10 ** REWARD_DECIMALS).toString());
+        setReferralReward(web3NoAccount.utils.fromWei(refEarnedWithdraw, REWARD_DECIMALS));
 
         const refTotalWithdraw = await Abi.methods.referralTotalRewards(curAcount).call();
-        setRefTotalWithdraw(new BigNumber(refTotalWithdraw).div(10 ** REWARD_DECIMALS).toString());
+        setRefTotalWithdraw(web3NoAccount.utils.fromWei(refTotalWithdraw, REWARD_DECIMALS));
       }
 
       // const owner = await Abi.methods.owner().call();
@@ -390,7 +389,7 @@ const Interface = () => {
         // console.log("success")
 
         setPendingMessage("Depositing...")
-        const _value = new BigNumber(depositValue).times(10 ** STAKE_DECIMALS);
+        const _value = web3NoAccount.utils.toWei(depositValue, STAKE_DECIMALS);
         console.log("[PRINCE](deposit): ", _value)
 
         let referrer = window.localStorage.getItem("REFERRAL");
@@ -434,7 +433,7 @@ const Interface = () => {
   //     setPendingTx(true)
   //     if (isConnected && Abi) {
   //       setPendingMessage("Unstaking...");
-  //       const _withdrawValue = new BigNumber(withdrawValue).times(10 ** STAKE_DECIMALS);
+        // const _withdrawValue = web3NoAccount.utils.fromWei(withdrawValue, STAKE_DECIMALS);
   //       console.log("[PRINCE](withdraw): ", _withdrawValue)
   //       await Abi.methods.withdraw(_withdrawValue).send({
   //         from: curAcount,
@@ -465,7 +464,7 @@ const Interface = () => {
       if (isConnected && tokenAbi) {
         setPendingMessage("Approving...");
 
-        await tokenAbi.methods.approve(contractAddress, BigNumber.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")).send({
+        await tokenAbi.methods.approve(contractAddress, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").send({
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)

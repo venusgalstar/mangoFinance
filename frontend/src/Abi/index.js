@@ -5,8 +5,8 @@ export const DEPOSIT_FEE = 100
 export const WITHDRAW_FEE = 50
 export const DENOMINATOR = 10000
 export const DENOMINATOR_PERCENT = 100
-export const STAKE_DECIMALS = 18
-export const REWARD_DECIMALS = 6
+export const STAKE_DECIMALS = 'ether' // 18
+export const REWARD_DECIMALS = 'Mwei' // 6
 export const EPOCH_LENGTH = 60
 // export const contractAddress = '0x83225d2236108832DaEB496186eD5E63193295F1';
 // export const START_TIME = 1665979239
@@ -1075,5 +1075,5 @@ const abi = [
 
 // @ts-ignore
 export default function getAbi(web3) {
-  return new web3.eth.Contract(abi, contractAddress);
+	return new web3.eth.Contract(abi, contractAddress);
 }
