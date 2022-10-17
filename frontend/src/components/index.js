@@ -189,7 +189,7 @@ const Interface = () => {
   useEffect(() => {
     const fetchData = async () => {
       const totalAmount = await AbiNoAccount.methods.totalAmount().call();
-      setTotalAmount(new BigNumber(totalAmount).div(10 ** STAKE_DECIMALS).toString());
+      setTotalAmount(new BigNumber(totalAmount).div(10 ** STAKE_DECIMALS));
 
       const epochNumberVal = await AbiNoAccount.methods.epochNumber().call();
       const curAPYVal = await AbiNoAccount.methods.apy(parseInt(epochNumberVal) + 1).call();
@@ -204,15 +204,15 @@ const Interface = () => {
         // console.log(curAcount);
 
         const userBalance = await tokenAbi.methods.balanceOf(curAcount).call();
-        setUserBalance(new BigNumber(userBalance).div(10 ** STAKE_DECIMALS).toString());
+        setUserBalance(new BigNumber(userBalance).div(10 ** STAKE_DECIMALS));
 
         const approvedAmount = await tokenAbi.methods.allowance(curAcount, contractAddress).call();
-        setUserApprovedAmount(new BigNumber(approvedAmount).div(10 ** STAKE_DECIMALS).toString());
+        setUserApprovedAmount(new BigNumber(approvedAmount).div(10 ** STAKE_DECIMALS));
 
         const lastActionEpochNumber = await Abi.methods.lastActionEpochNumber(curAcount).call();
         console.log("lastActionEpochNumber: ", lastActionEpochNumber)
         const userDepositedAmount = await Abi.methods.amount(curAcount, parseInt(lastActionEpochNumber) + 1).call();
-        setUserDepositedAmount(new BigNumber(userDepositedAmount).div(10 ** STAKE_DECIMALS).toString());
+        setUserDepositedAmount(new BigNumber(userDepositedAmount).div(10 ** STAKE_DECIMALS));
 
         // const dailyRoi = await Abi.methods.DailyRoi(userDepositedAmount.invested).call();
         // setUserDailyRoi(dailyRoi / 10e17);
@@ -387,7 +387,8 @@ const Interface = () => {
         // console.log("success")
 
         setPendingMessage("Depositing...")
-        const _value = new BigNumber(depositValue).times(10 ** STAKE_DECIMALS).toString();
+        const _value = new BigNumber(depositValue).times(10 ** STAKE_DECIMALS);
+        console.log("[PRINCE](deposit): ", _value)
 
         let referrer = window.localStorage.getItem("REFERRAL");
         referrer = isAddress(referrer, MAINNET) ? referrer : ADMIN_ACCOUNT
@@ -430,7 +431,8 @@ const Interface = () => {
       setPendingTx(true)
       if (isConnected && Abi) {
         setPendingMessage("Unstaking...");
-        const _withdrawValue = new BigNumber(withdrawValue).times(10 ** STAKE_DECIMALS).toString();
+        const _withdrawValue = new BigNumber(withdrawValue).times(10 ** STAKE_DECIMALS);
+        console.log("[PRINCE](withdraw): ", _withdrawValue)
         await Abi.methods.withdraw(_withdrawValue).send({
           from: curAcount,
         }).then((txHash) => {
@@ -464,7 +466,7 @@ const Interface = () => {
         if (Number(limit) > 0) {
           approveAddress = address;
         }
-        await tokenAbi.methods.approve(approveAddress, new BigNumber("10000000000000000000000000").times(10 ** STAKE_DECIMALS).toString()).send({
+        await tokenAbi.methods.approve(approveAddress, new BigNumber("10000000000000000000000000").times(10 ** STAKE_DECIMALS)).send({
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)
