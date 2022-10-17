@@ -278,6 +278,11 @@ const Interface = () => {
   const ClaimNow = async (e) => {
     try {
       e.preventDefault();
+      if (pendingTx) {
+        setPendingMessage("Pending...")
+        return
+      }
+
       if (nextWithdraw <= 0) {
         setPendingMessage("No Next Rewards!")
         return
@@ -326,6 +331,11 @@ const Interface = () => {
   const refWithdraw = async (e) => {
     try {
       e.preventDefault();
+      if (pendingTx) {
+        setPendingMessage("Pending...")
+        return
+      }
+
       if (referralReward <= 0) {
         setPendingMessage("No Next Referral Rewards!")
         return
@@ -364,6 +374,11 @@ const Interface = () => {
   const deposit = async (e) => {
     try {
       e.preventDefault();
+      if (pendingTx) {
+        setPendingMessage("Pending...")
+        return
+      }
+
       if (Number.isNaN(parseFloat(depositValue))) {
         setPendingMessage("Input Deposit Amount!")
         return
@@ -420,6 +435,11 @@ const Interface = () => {
 
   //   try {
   //     e.preventDefault();
+  // if (pendingTx) {
+  //   setPendingMessage("Pending...")
+  //   return
+  // }
+  // 
   //     if (Number.isNaN(parseFloat(withdrawValue))) {
   //       setPendingMessage("Input Withdraw Amount!")
   //       return
@@ -433,7 +453,7 @@ const Interface = () => {
   //     setPendingTx(true)
   //     if (isConnected && Abi) {
   //       setPendingMessage("Unstaking...");
-        // const _withdrawValue = web3NoAccount.utils.fromWei(withdrawValue, STAKE_DECIMALS);
+  // const _withdrawValue = web3NoAccount.utils.fromWei(withdrawValue, STAKE_DECIMALS);
   //       console.log("[PRINCE](withdraw): ", _withdrawValue)
   //       await Abi.methods.withdraw(_withdrawValue).send({
   //         from: curAcount,
@@ -458,9 +478,14 @@ const Interface = () => {
 
   const approve = async (e) => {
     try {
-      setPendingTx(true)
       console.log("[PRINCE](approve): ")
       e.preventDefault();
+      if (pendingTx) {
+        setPendingMessage("Pending...")
+        return
+      }
+
+      setPendingTx(true)
       if (isConnected && tokenAbi) {
         setPendingMessage("Approving...");
 
