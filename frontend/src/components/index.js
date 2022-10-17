@@ -18,7 +18,8 @@ import getAbi, {
   START_TIME,
   RPC_URL,
   MAINNET,
-  ADMIN_ACCOUNT
+  ADMIN_ACCOUNT,
+  REF_PREFIX
 } from "../Abi";
 import getTokenAbi from "../tokenAbi";
 // import logo from "./../assets/logo.png";
@@ -59,9 +60,7 @@ const Interface = () => {
   // const [accounts, setAccounts] = useState(null);
   const [curAcount, setCurAcount] = useState(null);
   const [connButtonText, setConnButtonText] = useState("CONNECT");
-  const [refLink, setRefLink] = useState(
-    "https://mangominer.finance/?ref=0x0000000000000000000000000000000000000000"
-  );
+  const [refLink, setRefLink] = useState(`${REF_PREFIX}0x0000000000000000000000000000000000000000`);
   const [totalAmount, setTotalAmount] = useState(0);
   const [userBalance, setUserBalance] = useState(0);
   const [userApprovedAmount, setUserApprovedAmount] = useState(0);
@@ -198,7 +197,7 @@ const Interface = () => {
       setCurAPY(curAPYVal)
 
       if (curAcount) {
-        const refLink = "https://mangominer.finance/?ref=" + curAcount;
+        const refLink = `${REF_PREFIX}` + curAcount;
         setRefLink(refLink);
       }
 

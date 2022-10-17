@@ -18,6 +18,8 @@ export const REWARD_DECIMALS = 'Gwei' // 9
 export const RPC_URL = "https://data-seed-prebsc-2-s2.binance.org:8545"
 export const MAINNET = 56
 export const ADMIN_ACCOUNT = '0x2Cc4467e7a94D55497B704a0acd90ACd1BF9A5af'
+export const PUBLIC_URL = "https://mango-finance-2022.web.app"
+export const REF_PREFIX = `${PUBLIC_URL}/?ref=`
 
 const abi = [
 	{
