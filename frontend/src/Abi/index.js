@@ -6,12 +6,14 @@ export const WITHDRAW_FEE = 50
 export const DENOMINATOR = 10000
 export const DENOMINATOR_PERCENT = 100
 export const STAKE_DECIMALS = 'ether' // 18
-export const REWARD_DECIMALS = 'Mwei' // 6
-export const EPOCH_LENGTH = 60
-// export const contractAddress = '0x83225d2236108832DaEB496186eD5E63193295F1';
-// export const START_TIME = 1665979239
-export const contractAddress = '0x278Ef11D4EAdAF6AdBe7F45Fd598A017fC788D46'; // without withdraw
-export const START_TIME = 1665986082 // without withdraw
+export const EPOCH_LENGTH = 300
+// export const contractAddress = '0x2039BaFBc73936D64Ce9d2dad42a036d9eD87feF'; // with withdraw
+// export const START_TIME = 1666027074
+// export const REWARD_DECIMALS = 'Mwei' // 6
+
+export const contractAddress = '0xad168818829E3a7C10c641836bcBD521C5766bda'; // without withdraw
+export const START_TIME = 1666025922 // without withdraw
+export const REWARD_DECIMALS = 'Gwei' // 9
 
 export const RPC_URL = "https://data-seed-prebsc-2-s2.binance.org:8545"
 export const MAINNET = 56
