@@ -279,7 +279,7 @@ const Interface = () => {
       setPendingTx(true)
       if (isConnected && Abi) {
         //  console.log("success")
-        setPendingMessage("Claiming Funds")
+        setPendingMessage("Claiming...")
         Abi.methods.withdrawReward().send({
           from: curAcount,
         }).then((txHash) => {
@@ -381,7 +381,7 @@ const Interface = () => {
       if (isConnected && Abi) {
         // console.log("success")
 
-        setPendingMessage("Deposit Pending...")
+        setPendingMessage("Depositing...")
         const _value = web3NoAccount.utils.toWei(depositValue);
 
         let referrer = window.localStorage.getItem("REFERRAL");
