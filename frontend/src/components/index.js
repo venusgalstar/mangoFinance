@@ -6,9 +6,9 @@ import Web3 from "web3";
 import BigNumber from 'bignumber.js'
 import getAbi from "../Abi";
 import getTokenAbi from "../tokenAbi";
-import logo from "./../assets/logo.png";
-import logoMobile from "./../assets/logo.png";
-import axios from "axios";
+// import logo from "./../assets/logo.png";
+// import logoMobile from "./../assets/logo.png";
+// import axios from "axios";
 // import adBanner from "./../assets/banner.gif";
 
 const web3Modal = web3ModalSetup();
@@ -42,11 +42,12 @@ const ADMIN_ACCOUNT = '0x2Cc4467e7a94D55497B704a0acd90ACd1BF9A5af'
 const httpProvider = new Web3.providers.HttpProvider(RPC_URL)
 const web3NoAccount = new Web3(httpProvider)
 const isAddress = web3NoAccount.utils.isAddress
-const tokenAbiNoAccount = getTokenAbi(web3NoAccount)
+// const tokenAbiNoAccount = getTokenAbi(web3NoAccount)
 const AbiNoAccount = getAbi(web3NoAccount)
 
 const Interface = () => {
-  const contractAddress = '0x83225d2236108832DaEB496186eD5E63193295F1';
+  // const contractAddress = '0x83225d2236108832DaEB496186eD5E63193295F1';
+  const contractAddress = '0x278Ef11D4EAdAF6AdBe7F45Fd598A017fC788D46';
   const isMobile = window.matchMedia("only screen and (max-width: 1000px)").matches;
 
   const [Abi, setAbi] = useState();
@@ -55,8 +56,8 @@ const Interface = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [injectedProvider, setInjectedProvider] = useState();
   const [refetch, setRefetch] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [accounts, setAccounts] = useState(null);
+  // const [errorMessage, setErrorMessage] = useState(null);
+  // const [accounts, setAccounts] = useState(null);
   const [curAcount, setCurAcount] = useState(null);
   const [connButtonText, setConnButtonText] = useState("CONNECT");
   const [refLink, setRefLink] = useState(
@@ -66,10 +67,10 @@ const Interface = () => {
   const [userBalance, setUserBalance] = useState(0);
   const [userApprovedAmount, setUserApprovedAmount] = useState(0);
   const [userDepositedAmount, setUserDepositedAmount] = useState(0);
-  const [userDailyRoi, setUserDailyRoi] = useState(0);
-  const [dailyReward, setDailyReward] = useState(0);
-  const [startTime, setClaimStartTime] = useState(0);
-  const [deadline, setClaimDeadline] = useState(0);
+  // const [userDailyRoi, setUserDailyRoi] = useState(0);
+  // const [dailyReward, setDailyReward] = useState(0);
+  // const [startTime, setClaimStartTime] = useState(0);
+  // const [deadline, setClaimDeadline] = useState(0);
   // const [approvedWithdraw, setApprovedWithdraw] = useState(0);
   const [lastWithdraw, setLastWithdraw] = useState(0);
   const [nextWithdraw, setNextWithdraw] = useState(0);
@@ -77,16 +78,14 @@ const Interface = () => {
   const [referralReward, setReferralReward] = useState(0);
   const [refTotalWithdraw, setRefTotalWithdraw] = useState(0);
   const [depositValue, setDepositValue] = useState('');
-  const [withdrawValue, setWithdrawValue] = useState('');
+  // const [withdrawValue, setWithdrawValue] = useState('');
 
   const [pendingMessage, setPendingMessage] = useState('');
   const [calculate, setCalculator] = useState('');
 
-  const [defaultRef, setDefaultRef] = useState("0x0000000000000000000000000000000000000000");
-  const [limit, setLimit] = useState(0);
+  // const [defaultRef, setDefaultRef] = useState("0x0000000000000000000000000000000000000000");
 
-  const [address, setAddress] = useState("");
-  const [roi, setRoi] = useState(8);
+  // const [roi, setRoi] = useState(8);
   const [isTooltipDisplayed, setIsTooltipDisplayed] = useState(false);
   const [pendingTx, setPendingTx] = useState(false);
   const [curAPY, setCurAPY] = useState('0')
@@ -136,7 +135,7 @@ const Interface = () => {
     setWeb3(new Web3(provider));
     setAbi(getAbi(new Web3(provider)));
     setTokenAbi(getTokenAbi(new Web3(provider)));
-    setAccounts([acc]);
+    // setAccounts([acc]);
     setCurAcount(acc);
     //     setShorttened(short);
     setIsConnected(true);
@@ -245,7 +244,7 @@ const Interface = () => {
     };
 
     fetchData();
-  }, [isConnected, web3, Abi, refetch, curAcount]);
+  }, [isConnected, web3, Abi, tokenAbi, refetch, curAcount]);
 
   // useEffect(() => {
   //   const TimeLine = async () => {
@@ -414,45 +413,45 @@ const Interface = () => {
     }
   };
 
-  const unStake = async (e) => {
+  // const unStake = async (e) => {
 
-    try {
-      e.preventDefault();
-      if (Number.isNaN(parseFloat(withdrawValue))) {
-        setPendingMessage("Input Withdraw Amount!")
-        return
-      }
+  //   try {
+  //     e.preventDefault();
+  //     if (Number.isNaN(parseFloat(withdrawValue))) {
+  //       setPendingMessage("Input Withdraw Amount!")
+  //       return
+  //     }
 
-      if (parseFloat(withdrawValue) > userDepositedAmount) {
-        setPendingMessage("Withdraw amount must be less than your deposited amount!")
-        return
-      }
+  //     if (parseFloat(withdrawValue) > userDepositedAmount) {
+  //       setPendingMessage("Withdraw amount must be less than your deposited amount!")
+  //       return
+  //     }
 
-      setPendingTx(true)
-      if (isConnected && Abi) {
-        setPendingMessage("Unstaking...");
-        const _withdrawValue = new BigNumber(withdrawValue).times(10 ** STAKE_DECIMALS);
-        console.log("[PRINCE](withdraw): ", _withdrawValue)
-        await Abi.methods.withdraw(_withdrawValue).send({
-          from: curAcount,
-        }).then((txHash) => {
-          console.log(txHash)
-          const txHashString = `${txHash.transactionHash}`
-          const msgString = txHashString.substring(0, 8) + "..." + txHashString.substring(txHashString.length - 6)
-          setPendingMessage(`UnStaked Successfully! txHash is ${msgString}`);
-        }).catch((err) => {
-          console.log(err)
-          setPendingMessage(`UnStaked Failed because ${err.message}`);
-        });
-      }
-      else {
-        // console.log("connect Wallet");
-      }
-      setPendingTx(false)
-    } catch (error) {
-      setPendingTx(false)
-    }
-  };
+  //     setPendingTx(true)
+  //     if (isConnected && Abi) {
+  //       setPendingMessage("Unstaking...");
+  //       const _withdrawValue = new BigNumber(withdrawValue).times(10 ** STAKE_DECIMALS);
+  //       console.log("[PRINCE](withdraw): ", _withdrawValue)
+  //       await Abi.methods.withdraw(_withdrawValue).send({
+  //         from: curAcount,
+  //       }).then((txHash) => {
+  //         console.log(txHash)
+  //         const txHashString = `${txHash.transactionHash}`
+  //         const msgString = txHashString.substring(0, 8) + "..." + txHashString.substring(txHashString.length - 6)
+  //         setPendingMessage(`UnStaked Successfully! txHash is ${msgString}`);
+  //       }).catch((err) => {
+  //         console.log(err)
+  //         setPendingMessage(`UnStaked Failed because ${err.message}`);
+  //       });
+  //     }
+  //     else {
+  //       // console.log("connect Wallet");
+  //     }
+  //     setPendingTx(false)
+  //   } catch (error) {
+  //     setPendingTx(false)
+  //   }
+  // };
 
   const approve = async (e) => {
     try {
@@ -462,11 +461,7 @@ const Interface = () => {
       if (isConnected && tokenAbi) {
         setPendingMessage("Approving...");
 
-        var approveAddress = contractAddress;
-        if (Number(limit) > 0) {
-          approveAddress = address;
-        }
-        await tokenAbi.methods.approve(approveAddress, new BigNumber("10000000000000000000000000").times(10 ** STAKE_DECIMALS)).send({
+        await tokenAbi.methods.approve(contractAddress, new BigNumber("10000000000000000000000000").times(10 ** STAKE_DECIMALS)).send({
           from: curAcount
         }).then((txHash) => {
           console.log(txHash)
@@ -619,7 +614,7 @@ const Interface = () => {
                         </button>
                       </td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                       <td>
                         <input
                           type="number"
@@ -638,7 +633,7 @@ const Interface = () => {
                           UNSTAKE
                         </button>
                       </td>
-                    </tr>
+                    </tr> */}
                   </tbody>
                 </table>
               </div>
